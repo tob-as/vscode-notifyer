@@ -1,15 +1,19 @@
-# TOB Claude Enablement
+# Team Standards
+@~/Projects/OriginalBody/tob-claude-setup/.claude/instructions/response-style-user.md
+@~/Projects/OriginalBody/tob-claude-setup/.claude/instructions/conflict-handling.md
+
+# Project-Specific: TOB Claude Enablement
 
 > Meta-repository for organization-wide Claude adoption. Contains shared configurations, skills, agents, and standards that enable both developers (coding assistance) and non-developers (app building without code).
 
-## Tech Stack
+### Tech Stack
 
 - **Claude Code** - Primary AI coding assistant
 - **Docker** - Containerized dev environments (VS Code Server + Claude CLI)
 - **Git** - Version control, branch-based workflows
 - **Railway** - Deployment platform for Claude-built apps (under consideration)
 
-## Project Structure
+### Project Structure
 
 ```
 /.claude/              - Importable configs for individual users
@@ -24,7 +28,7 @@
 
 Users can import from `.claude/` into their own `~/.claude/` directory.
 
-## Key Commands
+### Key Commands
 
 ```bash
 # Claude Code
@@ -39,7 +43,7 @@ Users can import from `.claude/` into their own `~/.claude/` directory.
 /fix-issue [number]      # Analyze and fix GitHub issue end-to-end
 ```
 
-## Code Style
+### Code Style
 
 - Keep configurations minimal and specific—no verbose explanations
 - Use explicit patterns over implicit conventions
@@ -47,7 +51,7 @@ Users can import from `.claude/` into their own `~/.claude/` directory.
 - Provide alternatives with restrictions: "Never X. Instead use Y for [case]"
 - Target 50-150 lines for CLAUDE.md files
 
-## Development Approach
+### Development Approach
 
 **Philosophy: Ship fast, iterate based on real usage**
 
@@ -62,7 +66,7 @@ Users can import from `.claude/` into their own `~/.claude/` directory.
 3. Build for reuse—think "could this become a skill?"
 4. Keep it simple and debuggable
 
-## Critical Constraints
+### Critical Constraints
 
 **Non-negotiables:**
 - All production code through André's CI/CD pipeline
@@ -72,7 +76,7 @@ Users can import from `.claude/` into their own `~/.claude/` directory.
 
 **Token budget:** ~$50/day acceptable
 
-## CLAUDE.md Hierarchy
+### CLAUDE.md Hierarchy
 
 All CLAUDE.md files are **merged**—Claude sees everything:
 1. `~/.claude/CLAUDE.md` — User-level (all projects)
@@ -85,21 +89,21 @@ For conflicts, use explicit overrides:
 - Package Manager: npm (not pnpm, legacy project)
 ```
 
-## Git Workflow
+### Git Workflow
 
 - Branch naming: `feature/[description]` or `fix/[description]`
 - Never commit directly to main
 - Run quality checks before committing
 - Use conventional commits: `feat:`, `fix:`, `refactor:`, `docs:`
 
-## Do Not
+### Do Not
 
 - Do not over-engineer for enterprise scale—we're a small team
 - Do not embed full documentation—link to docs, let Claude read selectively
 - Do not create verbose CLAUDE.md files—keep under 150 lines
 - Do not skip explicit override patterns when project needs differ from org standards
 
-## Key People
+### Key People
 
 - **Armin Soyka** (CEO) - Vision, strategic decisions
 - **Johannes Schulz** - System-facing: meta-repo, skills, agents, standards
@@ -107,12 +111,12 @@ For conflicts, use explicit overrides:
 - **André Laugks** - CI/CD, security sign-offs, quality gate
 - **Lukas Lindner** - Person-facing: onboarding, feedback, user bridge
 
-## Communication
+### Communication
 
 - **Slack:** #claude-code (private) — `C0A1C97RCP6`
 - **Secrets:** https://onetimesecret.original-body.dev/
 
-## When to Push Back
+### When to Push Back
 
 **Push back when:**
 - Request adds unnecessary complexity
@@ -129,3 +133,5 @@ For conflicts, use explicit overrides:
 
 *Last updated: 04.12.2025*
 *Phase: Setup / v0.1 Development*
+# Project Overrides
+

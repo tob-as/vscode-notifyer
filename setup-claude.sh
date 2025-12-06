@@ -72,6 +72,14 @@ if [ ! -f "CLAUDE.md" ]; then
   IS_NEW_SETUP=true
 fi
 
+# Check if CLAUDE.md has standard structure
+has_standard_structure() {
+  [ -f "CLAUDE.md" ] && \
+  grep -q "^# Team Standards" CLAUDE.md && \
+  grep -q "^# Project-Specific" CLAUDE.md && \
+  grep -q "^# Project Overrides" CLAUDE.md
+}
+
 if [ "$IS_NEW_SETUP" = true ]; then
   # Create new CLAUDE.md
   cat > CLAUDE.md << EOF
@@ -82,6 +90,36 @@ ${IMPORTS}
 # Project Overrides
 
 EOF
+elif ! has_standard_structure; then
+  # CLAUDE.md exists but doesn't have standard structure - refactor it automatically
+  echo "⚠️  CLAUDE.md has non-standard structure - restructuring automatically..."
+  echo ""
+
+  # Check if claude CLI is available
+  if ! command -v claude &> /dev/null; then
+    echo "Error: 'claude' CLI not found. Cannot refactor CLAUDE.md automatically."
+    echo "Please install Claude Code CLI first."
+    exit 1
+  fi
+
+  # Create backup
+  cp CLAUDE.md CLAUDE.md.backup
+  echo "✓ Backup created: CLAUDE.md.backup"
+
+  # Invoke Claude to restructure the file
+  echo "✓ Invoking Claude to restructure CLAUDE.md..."
+  cat "$SCRIPT_DIR/.claude/agents/refactor-claude-md.md" | claude
+
+  # Replace the placeholder with actual imports (using awk to handle multiline)
+  if grep -q "\[IMPORTS_PLACEHOLDER\]" CLAUDE.md; then
+    TEMP_FILE=$(mktemp)
+    awk -v imports="$IMPORTS" '{gsub(/\[IMPORTS_PLACEHOLDER\]/, imports)}1' CLAUDE.md > "$TEMP_FILE"
+    mv "$TEMP_FILE" CLAUDE.md
+    echo "✓ Team Standards imports added"
+  else
+    echo "⚠️  Warning: Could not find [IMPORTS_PLACEHOLDER] in restructured CLAUDE.md"
+    echo "   You may need to manually add Team Standards section"
+  fi
 else
   # Update existing CLAUDE.md - preserve project-specific content
   PROJECT_SPECIFIC_CONTENT=""
@@ -106,6 +144,14 @@ fi
 
 # Setup .claude directory
 mkdir -p .claude/commands .claude/skills .claude/hooks
+
+# Symlink agents and standards directories (used by /build command)
+if [ -d "$SCRIPT_DIR/.claude/agents" ]; then
+  ln -sfn "$SCRIPT_DIR/.claude/agents" ".claude/agents"
+fi
+if [ -d "$SCRIPT_DIR/.claude/standards" ]; then
+  ln -sfn "$SCRIPT_DIR/.claude/standards" ".claude/standards"
+fi
 
 # Helper function: symlink a file if it doesn't already exist (preserves user files)
 symlink_file() {
