@@ -2,12 +2,13 @@
 
 ## Branches
 
-Use `feature/[description]` for all work. Keep descriptions short and lowercase with hyphens.
+Use `type/description` format. Keep descriptions short, lowercase, with hyphens.
 
 ```
 feature/user-auth
-feature/export-csv
-feature/fix-login-bug
+fix/login-redirect
+chore/update-deps
+docs/api-reference
 ```
 
 ## Commits
@@ -23,24 +24,6 @@ refactor: simplify payment processing
 ```
 
 Keep messages short. No AI attribution.
-
-## Before Committing
-
-Run these checks—all must pass:
-
-```bash
-uv run ruff check .          # Lint
-uv run ruff format --check . # Format check
-uv run mypy .                # Type check
-uv run pytest                # Tests
-```
-
-Or fix and format automatically:
-
-```bash
-uv run ruff check --fix .    # Lint + autofix
-uv run ruff format .         # Format
-```
 
 ## Rules
 

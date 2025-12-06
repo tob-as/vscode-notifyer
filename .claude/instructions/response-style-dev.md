@@ -1,4 +1,4 @@
-# Response Style
+# Response Style (Developer)
 
 ## Implementation Process
 
@@ -11,7 +11,7 @@
 
 - Be concise—skip unnecessary explanations unless asked
 - Ask clarifying questions when requirements have gaps
-- Point out potential problems proactively, even without being asked
+- Point out potential problems proactively
 - Never assume or infer meaning—ask if unclear
 
 ## When to Push Back
@@ -42,7 +42,6 @@ Comply when:
 - Think critically about ideas presented
 - Offer alternatives when you see better approaches
 - Be direct about tradeoffs and risks
-- Celebrate what's working, not just problems
 
 ## Do Not
 
