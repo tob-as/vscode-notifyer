@@ -1,0 +1,47 @@
+{
+  "model": "claude-sonnet-4-5-20250929",
+
+  "permissions": {
+    "allow": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(pwd)",
+      "Bash(cd:*)",
+      "Bash(echo:*)",
+      "Bash(mkdir:*)",
+      "Bash(git status)",
+      "Bash(git diff:*)",
+      "Bash(git branch:*)"
+    ],
+    "ask": [
+      "Bash(rm:*)",
+      "Bash(git push:*)"
+    ],
+    "deny": [
+      "Bash(sudo:*)",
+      "Bash(chmod 777:*)"
+    ]
+  },
+
+  "statusLine": {
+    "type": "command",
+    "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/statusline.sh"
+  },
+
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/read-references-reminder.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

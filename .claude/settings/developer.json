@@ -1,0 +1,39 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ruff:*)",
+      "Bash(mypy:*)",
+      "Bash(pytest:*)",
+      "Bash(uv sync)",
+      "Bash(npm install)"
+    ],
+    "ask": [
+      "Write",
+      "Edit",
+      "MultiEdit",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git checkout:*)",
+      "Bash(curl:*)",
+      "Bash(wget:*)",
+      "Bash(docker:*)",
+      "Bash(npm run:*)",
+      "Bash(uv run:*)",
+      "Bash(python:*)"
+    ]
+  },
+
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write(*.py)|Edit(*.py)|MultiEdit(*.py)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "ruff format $CLAUDE_FILE_PATHS && ruff check --fix $CLAUDE_FILE_PATHS"
+          }
+        ]
+      }
+    ]
+  }
+}

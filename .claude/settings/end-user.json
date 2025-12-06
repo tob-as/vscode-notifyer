@@ -1,0 +1,29 @@
+{
+  "env": {
+    "MAX_THINKING_TOKENS": "10000"
+  },
+  "permissions": {
+    "allow": [
+      "Write",
+      "Edit",
+      "MultiEdit",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git checkout:*)",
+      "Bash(mkdir:*)",
+      "Bash(python:*)",
+      "Bash(uv:*)",
+      "Bash(uvicorn:*)",
+      "Bash(curl http://localhost:*)",
+      "Bash(curl http://127.0.0.1:*)"
+    ],
+    "ask": [
+      "Read(.env)",
+      "Read(*secret*)",
+      "Read(*credential*)"
+    ],
+    "deny": [
+      "Bash(docker:*)"
+    ]
+  }
+}
