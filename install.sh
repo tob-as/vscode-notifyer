@@ -56,6 +56,19 @@ if ! command -v node &> /dev/null; then
       [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
       nvm install --lts
       echo "✓ Node.js installed via nvm"
+
+      # Verify nvm was added to PATH
+      if grep -q "NVM_DIR" "$SHELL_RC" 2>/dev/null; then
+        echo "✓ nvm added to PATH in $SHELL_RC"
+      else
+        echo "⚠️  nvm not found in $SHELL_RC, adding manually..."
+        echo "" >> "$SHELL_RC"
+        echo "# nvm (Node Version Manager)" >> "$SHELL_RC"
+        echo "export NVM_DIR=\"\$HOME/.nvm\"" >> "$SHELL_RC"
+        echo "[ -s \"\$NVM_DIR/nvm.sh\" ] && \. \"\$NVM_DIR/nvm.sh\"" >> "$SHELL_RC"
+        echo "[ -s \"\$NVM_DIR/bash_completion\" ] && \. \"\$NVM_DIR/bash_completion\"" >> "$SHELL_RC"
+        echo "✓ nvm PATH added to $SHELL_RC"
+      fi
     fi
   else
     echo "⚠️  Unknown OS. Install Node.js manually from: https://nodejs.org"
