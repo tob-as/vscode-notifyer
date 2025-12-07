@@ -15,6 +15,27 @@ Create ONLY:
 - `.env`
 - `README.md`
 
+## Required Dependencies Checklist
+
+### Always Include in package.json:
+
+**Core Next.js:**
+- next, react, react-dom
+
+**Database (if using Prisma):**
+- @prisma/client (dependencies)
+- prisma (devDependencies)
+
+**Styling:**
+- tailwindcss, autoprefixer, postcss (devDependencies)
+- class-variance-authority, clsx, tailwind-merge
+
+**UI Components (based on Component Contracts):**
+- @radix-ui/* packages for shadcn/ui components used
+- Example: If using Button, include @radix-ui/react-slot
+
+**CRITICAL:** Verify Component Contracts list and include ALL required @radix-ui packages.
+
 ## package.json
 
 ```json
@@ -53,10 +74,13 @@ Create ONLY:
 
 ## app/layout.tsx
 
+**CRITICAL:** Always import and render Navbar component.
+
 ```tsx
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import Navbar from "@/components/layout/navbar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -68,7 +92,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="dark">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <Navbar />
+        {children}
+      </body>
     </html>
   );
 }
@@ -178,9 +205,14 @@ module.exports = {
 
 ## .env
 
+**CRITICAL:** Use absolute paths for DATABASE_URL, not relative paths.
+
 ```
-DATABASE_URL="file:./dev.db"
+# Use absolute path to ensure reliability across different working directories
+DATABASE_URL="file:PROJECT_ROOT/prisma/dev.db"
 ```
+
+Replace PROJECT_ROOT with the actual absolute path during project setup.
 
 ## README.md
 

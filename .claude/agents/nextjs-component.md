@@ -28,6 +28,29 @@ export default function ComponentName({ ...props }: ComponentNameProps) {
 
 **Never use named exports** for React components. This ensures consistency across all agents and prevents import/export mismatches.
 
+## "use client" Directive (CRITICAL)
+
+**Add "use client" at the TOP of file if component has ANY of:**
+- Event handlers: onClick, onChange, onSubmit, etc.
+- React hooks: useState, useEffect, useContext, etc.
+- Browser APIs: localStorage, window, document
+- Interactive elements: buttons with onClick, forms with onChange
+
+**Example:**
+```tsx
+"use client";  // First line, before imports
+
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+
+export default function InteractiveComponent() {
+  const [count, setCount] = useState(0);
+  return <Button onClick={() => setCount(count + 1)}>{count}</Button>;
+}
+```
+
+**Navbar component ALWAYS needs "use client"** because it has interactive navigation.
+
 ## Component Pattern
 
 ```tsx

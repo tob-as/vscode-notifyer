@@ -279,40 +279,92 @@ Launch these in parallel:
 **Phase 1:** Launch Python backend agents
 **Phase 2:** Launch Next.js frontend agents (but API routes call Python backend)
 
-## Phase 5: Validate
+## Phase 4.5: Pre-Build Validation (NEW - CRITICAL)
+
+**Run AFTER agents complete, BEFORE npm install.**
+
+This phase catches agent coordination errors and missing dependencies before runtime.
 
 ### For Next.js:
 
-**1. Parallel validation checks (single message with multiple Read/Glob calls):**
+**1. Parallel validation (single message with multiple Read/Glob calls):**
 
-Read these files simultaneously to verify they exist and are valid:
-- `package.json` - Check dependencies list
-- `app/layout.tsx` - Verify structure
-- `app/globals.css` - Check Tailwind directives
-- `tailwind.config.ts` - Verify config
-- `postcss.config.js` - **CRITICAL check**
-- `prisma/schema.prisma` - Verify schema syntax
-- `lib/db.ts` - Check Prisma client setup
-- Use Glob for `components/ui/*.tsx` - Find all UI components
-- Use Glob for `app/**/page.tsx` - Find all pages
+Read these files simultaneously:
+- `package.json` - Verify ALL required dependencies
+- `app/layout.tsx` - Check Navbar is imported and rendered
+- `prisma/schema.prisma` - If exists, check Prisma deps
+- `.env` - Check DATABASE_URL uses absolute path
+- Use Glob `components/**/*.tsx` - Find components needing "use client"
+- Use Glob `app/**/page.tsx` - Find all pages
 
-**Performance:** Parallel checks complete 3-5x faster than sequential.
+**2. Validate package.json Dependencies:**
 
-**2. Auto-fix missing postcss.config.js:**
+Check for common missing dependencies:
+```typescript
+// If prisma/schema.prisma exists:
+Required in dependencies: "@prisma/client"
+Required in devDependencies: "prisma"
 
-If `postcss.config.js` is missing, create it immediately:
-```js
-module.exports = {
-  plugins: {
-    tailwindcss: {},
-    autoprefixer: {},
-  },
-}
+// Based on Component Contracts:
+Check all @radix-ui/* packages are included
+Example: If Button in contracts, need @radix-ui/react-slot
+
+// Always required for Next.js + Tailwind:
+devDependencies: tailwindcss, autoprefixer, postcss
 ```
 
-**Note:** "Integration Agent missed postcss.config.js - created automatically"
+**If dependencies missing:** Add them to package.json before npm install.
 
-**3. Install dependencies in background:**
+**3. Validate layout.tsx Structure:**
+
+```typescript
+// Check app/layout.tsx contains:
+✅ import Navbar from "@/components/layout/navbar"
+✅ <Navbar /> rendered in body
+
+// If missing:
+Add import and render Navbar
+```
+
+**4. Validate DATABASE_URL:**
+
+```typescript
+// Check .env for DATABASE_URL
+// If relative path like "file:./prisma/dev.db":
+Replace with absolute path: "file:/absolute/path/to/project/prisma/dev.db"
+```
+
+**5. Check "use client" Directives:**
+
+For each component file, check if needs "use client":
+- Has onClick, onChange, onSubmit? → Needs "use client"
+- Has useState, useEffect, useContext? → Needs "use client"
+- Is Navbar component? → ALWAYS needs "use client"
+
+**If missing:** Add "use client" at top of file.
+
+**6. Validate Button+Link Patterns:**
+
+Scan all page files for incorrect patterns:
+```tsx
+// ❌ WRONG pattern:
+<Link href="/path"><Button>Text</Button></Link>
+
+// ✅ Should be:
+<Button asChild><Link href="/path">Text</Link></Button>
+```
+
+**If found:** Fix the pattern or create warning.
+
+**Performance:** All checks run in parallel, ~5-10 seconds total.
+
+---
+
+## Phase 5: Install & Run
+
+### For Next.js:
+
+**1. Install dependencies in background:**
 
 ```bash
 npm install
@@ -320,13 +372,11 @@ npm install
 
 Use `run_in_background: true` to start npm install without blocking.
 
-**4. While npm install runs, validate in parallel:**
-- Check all imports resolve
-- Verify TypeScript types are correct
-- Confirm Prisma schema is valid
-- Review component contracts are implemented
+**2. While npm install runs:**
+- Validation already complete (Phase 4.5)
+- Can perform other checks if needed
 
-**5. Monitor npm install completion:**
+**3. Monitor npm install completion:**
 
 Use BashOutput tool to check when npm install finishes, then:
 ```bash
@@ -334,7 +384,9 @@ npx prisma db push
 npm run dev
 ```
 
-**6. Fix any startup errors**
+**4. Fix any startup errors**
+
+Most errors should be prevented by Phase 4.5 validation, but fix any remaining issues.
 
 ### For Python:
 
