@@ -20,7 +20,9 @@
       "Bash(curl http://localhost:*)",
       "Bash(curl http://127.0.0.1:*)",
       "Bash(find:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(test:*)",
+      "Bash(cp:*)"
     ],
     "ask": [
       "Read(.env)",
