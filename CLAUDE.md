@@ -2,7 +2,7 @@
 @~/Projects/OriginalBody/tob-claude-setup/.claude/instructions/response-style-user.md
 @~/Projects/OriginalBody/tob-claude-setup/.claude/instructions/conflict-handling.md
 
-# Project-Specific: TOB Claude Enablement
+# Project-Specific
 
 > Meta-repository for organization-wide Claude adoption. Contains shared configurations, skills, agents, and standards that enable both developers (coding assistance) and non-developers (app building without code).
 
