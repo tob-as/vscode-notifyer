@@ -139,6 +139,7 @@ Use a single message with multiple Task tool calls to launch simultaneously:
 **1. UI Setup Agent**
 ```
 Task tool with subagent_type: "general-purpose"
+model: "sonnet"
 
 Prompt:
 You are the UI Setup agent.
@@ -173,6 +174,7 @@ Create prisma/schema.prisma and lib/db.ts now.
 **3. Integration Agent**
 ```
 Task tool with subagent_type: "general-purpose"
+model: "sonnet"
 
 Prompt:
 You are the Integration agent.
@@ -243,6 +245,13 @@ Create the page files now.
 **Note:** Agent automatically inherits nextjs-patterns and tailwind-patterns skills.
 
 **IMPORTANT:** Launch all agents in a single message with multiple Task tool calls. Do not wait for one to complete before launching others.
+
+**OPTIMIZATION:** While agents work, start npm install in background:
+```bash
+npm install &
+```
+
+By the time agents finish (2-3 min), npm install will be complete. This saves 2-3 minutes in Phase 6.
 
 ### Python Stack Agents
 
