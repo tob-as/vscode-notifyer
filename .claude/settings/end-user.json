@@ -14,8 +14,13 @@
       "Bash(python:*)",
       "Bash(uv:*)",
       "Bash(uvicorn:*)",
+      "Bash(npm:*)",
+      "Bash(npx:*)",
+      "Bash(node:*)",
       "Bash(curl http://localhost:*)",
-      "Bash(curl http://127.0.0.1:*)"
+      "Bash(curl http://127.0.0.1:*)",
+      "Bash(find:*)",
+      "Bash(ls:*)"
     ],
     "ask": [
       "Read(.env)",
