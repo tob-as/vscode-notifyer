@@ -20,6 +20,8 @@
       "Bash(curl:*)",
       "Bash(find:*)",
       "Bash(ls:*)",
+      "Bash(grep:*)",
+      "Bash(sed:*)",
       "Bash(test:*)",
       "Bash(cp:*)",
       "Bash(mkdir:*)",
