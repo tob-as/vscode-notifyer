@@ -65,23 +65,28 @@ Read these files simultaneously:
 
 **Performance:** Parallel reads complete 4x faster than sequential.
 
-## Phase 3.5: Generate Component Contracts
+## Phase 3.5: Generate Component Contracts (MANDATORY)
 
-**For Next.js apps with custom components (not just CRUD pages):**
+**For ALL Next.js apps:**
 
-Before launching agents, create shared contracts for components that will be created by one agent and consumed by another.
+Before launching agents, create shared contracts for ALL components that will be created by one agent and consumed by another. This prevents missing exports and coordination failures.
 
-### When to Create Contracts
+### Always Create Contracts For
 
-Create contracts for:
+**1. shadcn/ui components (REQUIRED):**
+- Specify ALL exports that page agents will need
+- Even standard components like Card, Button, Input need complete specs
+- Prevents missing exports like CardDescription
+
+**2. Custom components:**
 - Game components (e.g., TetrisBoard, ChessBoard)
 - Interactive widgets (e.g., DragDropZone, DatePicker)
 - Complex shared components (e.g., DataTable, Chart)
 
-Skip contracts for:
-- Simple CRUD pages (standard patterns)
-- shadcn/ui components (already have contracts)
-- Layouts and navigation (standard structure)
+**3. Shared components:**
+- Navbar/Header
+- Footer
+- Any component used across multiple pages
 
 ### Contract Template
 
@@ -99,7 +104,7 @@ Props: {
 }
 ```
 
-**Example:**
+**Example - Custom Component:**
 ```typescript
 // TetrisBoard Contract
 Component: TetrisBoard
@@ -110,6 +115,29 @@ Props: {
   onGameOver: (score: number, level: number, lines: number) => void;
 }
 ```
+
+**Example - shadcn/ui Component (Card):**
+```typescript
+// Card Component Contract
+File: components/ui/card.tsx
+Exports (ALL required):
+  - Card
+  - CardHeader
+  - CardTitle
+  - CardContent
+  - CardDescription  ← Must include all parts
+  - CardFooter
+Import: import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card'
+```
+
+**Standard shadcn/ui contracts to include:**
+- **Card:** Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter
+- **Button:** Button, buttonVariants
+- **Input:** Input
+- **Label:** Label
+- **Select:** Select, SelectContent, SelectItem, SelectTrigger, SelectValue
+- **Table:** Table, TableHeader, TableBody, TableRow, TableHead, TableCell
+- **Badge:** Badge, badgeVariants
 
 ### Pass Contracts to Agents
 
@@ -326,11 +354,13 @@ npm run dev
 
 3. **Fix any startup errors**
 
-## Phase 6: Deliver
+## Phase 6: Deliver and Document
+
+### Step 1: Provide Instructions
 
 Provide simple instructions based on stack:
 
-### Next.js:
+#### Next.js:
 ```
 Your [app_name] is ready!
 
@@ -346,7 +376,7 @@ You'll see [description of what they'll see].
 To stop: Press Ctrl+C
 ```
 
-### Python:
+#### Python:
 ```
 Your [app_name] is ready!
 
@@ -360,6 +390,43 @@ You'll see [description of what they'll see].
 
 To stop: Press Ctrl+C
 ```
+
+### Step 2: Generate Initial Build Report (AUTOMATIC)
+
+**IMMEDIATELY after delivering instructions, launch the Build Reporter agent in background:**
+
+```
+Task tool with subagent_type: "general-purpose"
+run_in_background: true
+
+Prompt:
+You are the Build Reporter agent creating the INITIAL build report.
+
+[Insert contents of .claude/agents/build-reporter.md]
+
+PROJECT CONTEXT:
+- app_name: [app name]
+- project_name: [project-name-lowercase]
+- stack: [Next.js/Python/Hybrid]
+- build_start_time: [when /build was invoked]
+- errors_encountered: [count of errors fixed during build]
+- report_type: INITIAL (will be updated after user testing)
+
+Review the conversation from /build start through delivery and create initial build report.
+
+Create report at: ~/Projects/OriginalBody/tob-claude-setup/reports/[project-name]-build-report.md
+```
+
+### Step 3: Inform User
+
+After launching the reporter agent, inform the user:
+
+```
+Initial build report is being generated in the background at:
+~/Projects/OriginalBody/tob-claude-setup/reports/[project-name]-build-report.md
+```
+
+Then proceed to Phase 7 for testing and iteration.
 
 ## Stack Selection Examples
 
@@ -390,15 +457,31 @@ To stop: Press Ctrl+C
 | With dashboard | 8-9 | 8-9 |
 | Game/interactive | 4-5 | N/A |
 
-## Phase 7: Generate Build Report
+## Phase 7: Test, Iterate, and Finalize
 
-After delivering the working app, launch the Build Reporter agent to document the build process:
+### User Testing Loop
+
+**Ask the user for feedback and iterate until they confirm the app is working:**
+
+1. **Ask: "The app is running. Please test it and let me know: Are there any issues, errors, or improvements you'd like?"**
+
+2. **If user reports issues:**
+   - Fix the reported issues
+   - Document what was fixed
+   - Repeat step 1 (ask again)
+
+3. **If user confirms everything works:**
+   - Proceed to update the build report
+
+### Update Build Report (When User Confirms)
+
+**Once user confirms the app is working correctly, update the existing build report:**
 
 ```
 Task tool with subagent_type: "general-purpose"
 
 Prompt:
-You are the Build Reporter agent.
+You are the Build Reporter agent UPDATING the existing build report.
 
 [Insert contents of .claude/agents/build-reporter.md]
 
@@ -406,21 +489,38 @@ PROJECT CONTEXT:
 - app_name: [app name]
 - project_name: [project-name-lowercase]
 - stack: [Next.js/Python/Hybrid]
-- build_start_time: [when /build was invoked]
-- errors_encountered: [count of errors fixed]
+- report_type: FINAL UPDATE
+- post_delivery_issues: [list of issues user reported and how they were fixed]
+- user_confirmation: "User confirmed: [their exact words]"
 
-Review the entire conversation since /build was invoked and create a comprehensive build report documenting all errors, issues, and problems.
+TASK: Read the existing report at ~/Projects/OriginalBody/tob-claude-setup/reports/[project-name]-build-report.md
 
-Create the report now at ~/Projects/OriginalBody/tob-claude-setup/reports/[project-name]-build-report.md
+Then APPEND a new section at the end:
+
+## Post-Delivery Iterations
+
+[Document all issues found during user testing and how they were resolved]
+
+### Issue #1: [Name]
+**User Report:** "[exact user quote]"
+**Fix:** [what was done]
+
+[Repeat for each issue]
+
+## Final Status
+
+✅ **User Confirmed Working** - "[user's confirmation quote]"
+
+Build completed successfully at [timestamp].
 ```
 
-The reporter will:
-- Review all errors from Phase 1-6
-- Document technical errors (missing files, prop mismatches, etc.)
-- Document UX problems (if any testing occurred)
-- Identify agent coordination issues
-- Generate timeline of build process
-- Save report to tob-claude-setup/reports/
+### Summary
+
+The two-phase reporting approach creates a complete audit trail:
+- **Initial report** (Phase 6): Documents build process and initial errors
+- **Final update** (Phase 7): Documents user testing iterations and confirmation
+
+This ensures every issue is captured, from build-time errors to runtime bugs discovered during testing.
 
 ## Phase 8: Parallel Quality Assurance (Optional)
 
