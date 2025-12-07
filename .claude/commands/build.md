@@ -46,26 +46,7 @@ Based on the request, select the appropriate stack:
 
 **Stack:** Next.js frontend + Python backend API
 
-## Phase 3: Read Standards
-
-**Read all standards files in parallel** (single message with multiple Read tool calls):
-
-### For Next.js Stack:
-Read these files simultaneously:
-- `.claude/standards/nextjs.md`
-- `.claude/standards/react.md`
-- `.claude/standards/tailwind.md`
-- `.claude/standards/prisma.md`
-
-### For Python Stack:
-Read these files simultaneously:
-- `.claude/standards/fastapi.md`
-- `.claude/standards/sqlalchemy.md`
-- `.claude/standards/ui-design.md`
-
-**Performance:** Parallel reads complete 4x faster than sequential.
-
-## Phase 3.5: Generate Component Contracts (MANDATORY)
+## Phase 3: Generate Component Contracts (MANDATORY)
 
 **For ALL Next.js apps:**
 
@@ -179,7 +160,6 @@ Prompt:
 You are the Prisma Schema agent.
 
 [Insert contents of .claude/agents/prisma-schema.md]
-[Insert contents of .claude/standards/prisma.md]
 
 PROJECT CONTEXT:
 Entities to create:
@@ -187,6 +167,8 @@ Entities to create:
 
 Create prisma/schema.prisma and lib/db.ts now.
 ```
+
+**Note:** Agent automatically inherits prisma-patterns skill for latest standards.
 
 **3. Integration Agent**
 ```
@@ -214,15 +196,13 @@ Prompt:
 You are a Component agent.
 
 [Insert contents of .claude/agents/nextjs-component.md]
-[Insert contents of .claude/standards/react.md]
-[Insert contents of .claude/standards/tailwind.md]
 
 PROJECT CONTEXT:
 - app_name: [app_name]
 - components needed: navbar, [any feature-specific components]
 
 COMPONENT CONTRACTS (implement exactly):
-[If Phase 3.5 generated contracts, paste them here]
+[If Phase 3 generated contracts, paste them here]
 [Component Agent must implement these contracts precisely]
 
 FILE OWNERSHIP:
@@ -232,6 +212,8 @@ FILE OWNERSHIP:
 Create the component files now.
 ```
 
+**Note:** Agent automatically inherits react-patterns and tailwind-patterns skills.
+
 **5+ Page Agents** (one per feature/entity)
 ```
 Task tool with subagent_type: "general-purpose"
@@ -240,8 +222,6 @@ Prompt:
 You are a Next.js Page agent.
 
 [Insert contents of .claude/agents/nextjs-page.md]
-[Insert contents of .claude/standards/nextjs.md]
-[Insert contents of .claude/standards/tailwind.md]
 
 PROJECT CONTEXT:
 - app_name: [app_name]
@@ -249,7 +229,7 @@ PROJECT CONTEXT:
 - pages to create: list, form, detail
 
 COMPONENT CONTRACTS (use exactly):
-[If Phase 3.5 generated contracts, paste them here]
+[If Phase 3 generated contracts, paste them here]
 [Page Agent must import and use these contracts precisely]
 
 FILE OWNERSHIP (create ONLY these):
@@ -259,6 +239,8 @@ FILE OWNERSHIP (create ONLY these):
 
 Create the page files now.
 ```
+
+**Note:** Agent automatically inherits nextjs-patterns and tailwind-patterns skills.
 
 **IMPORTANT:** Launch all agents in a single message with multiple Task tool calls. Do not wait for one to complete before launching others.
 
@@ -279,7 +261,7 @@ Launch these in parallel:
 **Phase 1:** Launch Python backend agents
 **Phase 2:** Launch Next.js frontend agents (but API routes call Python backend)
 
-## Phase 4.5: Pre-Build Validation (NEW - CRITICAL)
+## Phase 5: Pre-Build Validation (CRITICAL)
 
 **Run AFTER agents complete, BEFORE npm install.**
 
@@ -360,7 +342,7 @@ Scan all page files for incorrect patterns:
 
 ---
 
-## Phase 5: Install & Run
+## Phase 6: Install & Run
 
 ### For Next.js:
 
@@ -373,7 +355,7 @@ npm install
 Use `run_in_background: true` to start npm install without blocking.
 
 **2. While npm install runs:**
-- Validation already complete (Phase 4.5)
+- Validation already complete (Phase 5)
 - Can perform other checks if needed
 
 **3. Monitor npm install completion:**
@@ -386,7 +368,7 @@ npm run dev
 
 **4. Fix any startup errors**
 
-Most errors should be prevented by Phase 4.5 validation, but fix any remaining issues.
+Most errors should be prevented by Phase 5 validation, but fix any remaining issues.
 
 ### For Python:
 
@@ -406,7 +388,7 @@ Most errors should be prevented by Phase 4.5 validation, but fix any remaining i
 
 3. **Fix any startup errors**
 
-## Phase 6: Deliver and Document
+## Phase 7: Deliver and Document
 
 ### Step 1: Provide Instructions
 
@@ -478,7 +460,7 @@ Initial build report is being generated in the background at:
 ~/Projects/OriginalBody/tob-claude-setup/reports/[project-name]-build-report.md
 ```
 
-Then proceed to Phase 7 for testing and iteration.
+Then proceed to Phase 8 for testing and iteration.
 
 ## Stack Selection Examples
 
@@ -509,7 +491,7 @@ Then proceed to Phase 7 for testing and iteration.
 | With dashboard | 8-9 | 8-9 |
 | Game/interactive | 4-5 | N/A |
 
-## Phase 7: Test, Iterate, and Finalize
+## Phase 8: Test, Iterate, and Finalize
 
 ### User Testing Loop
 
@@ -569,19 +551,19 @@ Build completed successfully at [timestamp].
 ### Summary
 
 The two-phase reporting approach creates a complete audit trail:
-- **Initial report** (Phase 6): Documents build process and initial errors
-- **Final update** (Phase 7): Documents user testing iterations and confirmation
+- **Initial report** (Phase 7): Documents build process and initial errors
+- **Final update** (Phase 8): Documents user testing iterations and confirmation
 
 This ensures every issue is captured, from build-time errors to runtime bugs discovered during testing.
 
-## Phase 8: Parallel Quality Assurance (Optional)
+## Phase 9: Parallel Quality Assurance (Optional)
 
 **For production-ready apps, launch Testing and Design agents in parallel on separate branches.**
 
 ### Branch Strategy
 
 ```
-main (working app from Phase 6)
+main (working app from Phase 7)
   ├─ feature/qa-testing   (Testing Agent)
   └─ feature/qa-design    (Design Agent)
        ↓                        ↓

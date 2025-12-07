@@ -1,3 +1,9 @@
+---
+name: tailwind-patterns
+description: Tailwind CSS + shadcn/ui component patterns, Dialog/Modal layouts, conditional classes. Use when styling components, creating modals, or working with shadcn/ui.
+allowed-tools: Read, Grep, Glob
+---
+
 # Tailwind + shadcn/ui Standards
 
 Dark mode by default. Use shadcn/ui components.
@@ -85,6 +91,19 @@ import { cn } from "@/lib/utils";
 - `h-full` works in flexbox (fills remaining space automatically)
 - `h-full` fails in grid without `grid-template-rows` or `grid-rows-[...]`
 - Common mistake: treating grid like flexbox
+
+## Verify Existing Patterns
+
+```bash
+# Find Dialog usage
+grep -r "DialogContent" components/ --include="*.tsx"
+
+# Find cn() usage
+grep -r "cn(" components/ --include="*.tsx"
+
+# Find grid layouts
+grep -r "grid" components/ --include="*.tsx"
+```
 
 ## Do Not
 

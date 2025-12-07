@@ -1,6 +1,28 @@
+---
+name: nextjs-patterns
+description: Next.js 14+ App Router patterns, Server/Client component rules, Button+Link patterns, data fetching. Use when creating pages, components, layouts, or routes in Next.js apps. Checks latest docs when needed.
+allowed-tools: WebFetch, Read, Grep, Glob
+---
+
 # Next.js Standards
 
 Next.js 14+ with App Router.
+
+## When to Use This Skill
+
+- Creating pages, layouts, or API routes
+- Implementing Server Actions or data fetching
+- Working with Server vs Client Components
+- Adding navigation with Button + Link patterns
+- Need to verify latest Next.js patterns
+
+## Fetch Latest Docs When Needed
+
+If unsure about current best practices, fetch from:
+- **App Router**: https://nextjs.org/docs/app/building-your-application/routing
+- **Server Components**: https://nextjs.org/docs/app/building-your-application/rendering/server-components
+- **Data Fetching**: https://nextjs.org/docs/app/building-your-application/data-fetching
+- **Server Actions**: https://nextjs.org/docs/app/building-your-application/data-fetching/server-actions-and-mutations
 
 ## Structure
 ```
@@ -182,6 +204,20 @@ export default function Interactive() {
   const [state, setState] = useState();
   return <button onClick={() => setState(...)} />;
 }
+```
+
+## Verify Against Codebase
+
+Before generating code, search existing patterns:
+```bash
+# Find Server Components with data fetching
+grep -r "export default async function" app/ --include="*.tsx"
+
+# Find Client Components
+grep -r "\"use client\"" app/ --include="*.tsx"
+
+# Find Server Actions
+grep -r "\"use server\"" app/ --include="*.tsx"
 ```
 
 ## Do Not

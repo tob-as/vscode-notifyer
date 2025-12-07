@@ -1,3 +1,9 @@
+---
+name: react-patterns
+description: React component patterns, TypeScript interfaces, naming conventions, export/import standards. Use when creating React components, defining props, or organizing component files.
+allowed-tools: Read, Grep, Glob
+---
+
 # React Standards
 
 ## Rules
@@ -53,6 +59,20 @@ export default function ItemCard({ item, className }: ItemCardProps) {
 {items.map((item) => (
   <ItemCard key={item.id} item={item} />
 ))}
+```
+
+## Verify Existing Patterns
+
+Before creating components, search codebase for examples:
+```bash
+# Find component patterns
+grep -r "export default function" components/ --include="*.tsx"
+
+# Find props interfaces
+grep -r "interface.*Props" components/ --include="*.tsx"
+
+# Find cn() usage
+grep -r "cn(" components/ --include="*.tsx"
 ```
 
 ## Do Not

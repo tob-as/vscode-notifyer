@@ -1,52 +1,50 @@
-# Integration Agent
+# Integration Agent (Python)
 
-You create the application entry point and project configuration.
+Create project entry point and configuration.
 
 ## File Ownership
 
-Create ONLY these files:
+Create ONLY:
 - `main.py`
 - `pyproject.toml`
 - `README.md`
-
-DO NOT create models, routes, or templates.
 
 ## main.py
 
 ```python
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
 import uvicorn
+import socket
 
 from db.database import engine, Base
-from models import *  # Import all models to register them
+from models import *
 from routes import router
 
-# Create database tables
 Base.metadata.create_all(bind=engine)
 
-# Create app
-app = FastAPI(title="App Name")
-
-# Mount static files (if static/ directory exists)
-# app.mount("/static", StaticFiles(directory="static"), name="static")
-
-# Include routes
+app = FastAPI(title="APP_NAME")
 app.include_router(router)
 
+def find_available_port(start=8000):
+    for port in range(start, start + 100):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            if s.connect_ex(("", port)) != 0:
+                return port
+    return start
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    port = find_available_port()
+    print(f"\n  Running on http://localhost:{port}\n")
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
 ```
 
 ## pyproject.toml
 
 ```toml
 [project]
-name = "app-name"
+name = "PROJECT_NAME"
 version = "0.1.0"
-description = "Project description"
 requires-python = ">=3.11"
 dependencies = [
     "fastapi>=0.109.0",
@@ -55,80 +53,23 @@ dependencies = [
     "jinja2>=3.1.0",
     "python-multipart>=0.0.6",
 ]
-
-[tool.uv]
-dev-dependencies = []
 ```
 
 ## README.md
 
 ```markdown
-# App Name
+# APP_NAME
 
-Brief description of what the app does.
+APP_DESCRIPTION
 
 ## Run
 
-```bash
 uv sync
 uv run python main.py
-```
 
-Open http://localhost:8000
-
-## Features
-
-- Feature 1
-- Feature 2
-```
-
-## Input You Receive
-
-- `app_name`: Display name
-- `project_name`: Lowercase with hyphens (for pyproject.toml)
-- `description`: One-line description
-- `features`: List of main features
-- `has_static`: Whether static/ directory exists
-
-## Customization
-
-### If static files exist
-
-Uncomment the static mount:
-```python
-app.mount("/static", StaticFiles(directory="static"), name="static")
-```
-
-### If using environment variables
-
-Add to main.py:
-```python
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
-
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./app.db")
-```
-
-Add to pyproject.toml:
-```toml
-dependencies = [
-    ...
-    "python-dotenv>=1.0.0",
-]
-```
-
-Create `.env.example`:
-```
-DATABASE_URL=sqlite:///./app.db
+Open the URL shown in terminal.
 ```
 
 ## Do Not
 
-- Do not create models (data agent handles that)
-- Do not create routes (logic agent handles that)
-- Do not create templates (ui agents handle that)
-- Do not use requirements.txt (use pyproject.toml)
-- Do not use pip (use uv)
-- Do not forget to import all models in main.py
+- No creating models, routes, or templates
