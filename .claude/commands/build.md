@@ -460,7 +460,7 @@ Initial build report is being generated in the background at:
 ~/Projects/OriginalBody/tob-claude-setup/reports/[project-name]-build-report.md
 ```
 
-Then proceed to Phase 8 for testing and iteration.
+Then proceed to Phase 8 for automated QA (if needed).
 
 ## Stack Selection Examples
 
@@ -491,74 +491,9 @@ Then proceed to Phase 8 for testing and iteration.
 | With dashboard | 8-9 | 8-9 |
 | Game/interactive | 4-5 | N/A |
 
-## Phase 8: Test, Iterate, and Finalize
+## Phase 8: Parallel Quality Assurance (Optional)
 
-### User Testing Loop
-
-**Ask the user for feedback and iterate until they confirm the app is working:**
-
-1. **Ask: "The app is running. Please test it and let me know: Are there any issues, errors, or improvements you'd like?"**
-
-2. **If user reports issues:**
-   - Fix the reported issues
-   - Document what was fixed
-   - Repeat step 1 (ask again)
-
-3. **If user confirms everything works:**
-   - Proceed to update the build report
-
-### Update Build Report (When User Confirms)
-
-**Once user confirms the app is working correctly, update the existing build report:**
-
-```
-Task tool with subagent_type: "general-purpose"
-
-Prompt:
-You are the Build Reporter agent UPDATING the existing build report.
-
-[Insert contents of .claude/agents/build-reporter.md]
-
-PROJECT CONTEXT:
-- app_name: [app name]
-- project_name: [project-name-lowercase]
-- stack: [Next.js/Python/Hybrid]
-- report_type: FINAL UPDATE
-- post_delivery_issues: [list of issues user reported and how they were fixed]
-- user_confirmation: "User confirmed: [their exact words]"
-
-TASK: Read the existing report at ~/Projects/OriginalBody/tob-claude-setup/reports/[project-name]-build-report.md
-
-Then APPEND a new section at the end:
-
-## Post-Delivery Iterations
-
-[Document all issues found during user testing and how they were resolved]
-
-### Issue #1: [Name]
-**User Report:** "[exact user quote]"
-**Fix:** [what was done]
-
-[Repeat for each issue]
-
-## Final Status
-
-✅ **User Confirmed Working** - "[user's confirmation quote]"
-
-Build completed successfully at [timestamp].
-```
-
-### Summary
-
-The two-phase reporting approach creates a complete audit trail:
-- **Initial report** (Phase 7): Documents build process and initial errors
-- **Final update** (Phase 8): Documents user testing iterations and confirmation
-
-This ensures every issue is captured, from build-time errors to runtime bugs discovered during testing.
-
-## Phase 9: Parallel Quality Assurance (Optional)
-
-**For production-ready apps, launch Testing and Design agents in parallel on separate branches.**
+**For production-ready apps, launch Testing and Design agents in parallel on separate branches BEFORE user testing.**
 
 ### Branch Strategy
 
@@ -702,3 +637,73 @@ git branch -d feature/qa-design
 **Parallel QA:** Testing || Design (10-15 min in parallel) → Merge (2 min) → Final test (2 min) = **14-19 min**
 
 **Speedup:** ~30-40% faster
+
+After QA is complete, proceed to Phase 9 for user testing.
+
+---
+
+## Phase 9: User Testing and Finalization
+
+### User Testing Loop
+
+**Ask the user for feedback and iterate until they confirm the app is working:**
+
+1. **Ask: "The app is running. Please test it and let me know: Are there any issues, errors, or improvements you'd like?"**
+
+2. **If user reports issues:**
+   - Fix the reported issues
+   - Document what was fixed
+   - Repeat step 1 (ask again)
+
+3. **If user confirms everything works:**
+   - Proceed to update the build report
+
+### Update Build Report (When User Confirms)
+
+**Once user confirms the app is working correctly, update the existing build report:**
+
+```
+Task tool with subagent_type: "general-purpose"
+
+Prompt:
+You are the Build Reporter agent UPDATING the existing build report.
+
+[Insert contents of .claude/agents/build-reporter.md]
+
+PROJECT CONTEXT:
+- app_name: [app name]
+- project_name: [project-name-lowercase]
+- stack: [Next.js/Python/Hybrid]
+- report_type: FINAL UPDATE
+- post_delivery_issues: [list of issues user reported and how they were fixed]
+- user_confirmation: "User confirmed: [their exact words]"
+
+TASK: Read the existing report at ~/Projects/OriginalBody/tob-claude-setup/reports/[project-name]-build-report.md
+
+Then APPEND a new section at the end:
+
+## Post-Delivery Iterations
+
+[Document all issues found during user testing and how they were resolved]
+
+### Issue #1: [Name]
+**User Report:** "[exact user quote]"
+**Fix:** [what was done]
+
+[Repeat for each issue]
+
+## Final Status
+
+✅ **User Confirmed Working** - "[user's confirmation quote]"
+
+Build completed successfully at [timestamp].
+```
+
+### Summary
+
+The two-phase reporting approach creates a complete audit trail:
+- **Initial report** (Phase 7): Documents build process and initial errors
+- **Automated QA** (Phase 8): Optional testing and design improvements
+- **Final update** (Phase 9): Documents user testing iterations and confirmation
+
+This ensures every issue is captured, from build-time errors to automated QA to user-discovered bugs.
