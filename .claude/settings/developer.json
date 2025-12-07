@@ -8,9 +8,6 @@
       "Bash(npm install)"
     ],
     "ask": [
-      "Write",
-      "Edit",
-      "MultiEdit",
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(git checkout:*)",
