@@ -8,15 +8,11 @@
       "Bash(npm install)"
     ],
     "ask": [
-      "Bash(git add:*)",
-      "Bash(git commit:*)",
-      "Bash(git checkout:*)",
       "Bash(curl:*)",
       "Bash(wget:*)",
-      "Bash(docker:*)",
-      "Bash(npm run:*)",
-      "Bash(uv run:*)",
-      "Bash(python:*)"
+      "Bash(docker rm:*)",
+      "Bash(docker rmi:*)",
+      "Bash(docker system:*)"
     ]
   },
 
