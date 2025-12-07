@@ -131,7 +131,16 @@ For conflicts, use explicit overrides:
 
 ---
 
-*Last updated: 04.12.2025*
+### Backlog
+
+Persistent todos for this project. Add items here during sessions; review and clean up regularly.
+
+- [ ] Add version tracking to skills (track "last verified" date or library versions)
+- [ ] Document cross-skill interaction (what happens when agents load multiple skills)
+
+---
+
+*Last updated: 07.12.2025*
 *Phase: Setup / v0.1 Development*
 # Project Overrides
 

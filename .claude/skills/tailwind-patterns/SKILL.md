@@ -1,7 +1,7 @@
 ---
 name: tailwind-patterns
 description: Tailwind CSS + shadcn/ui component patterns, Dialog/Modal layouts, conditional classes. Use when styling components, creating modals, or working with shadcn/ui.
-allowed-tools: Read, Grep, Glob
+allowed-tools: WebFetch, Read, Grep, Glob
 ---
 
 # Tailwind + shadcn/ui Standards
@@ -111,3 +111,12 @@ grep -r "grid" components/ --include="*.tsx"
 - No other UI libraries (Bootstrap, etc.)
 - No inline styles
 - No CSS modules
+
+## Fetch Latest Docs When Needed
+
+If unsure about current best practices or component APIs, fetch from:
+- shadcn/ui Button: https://ui.shadcn.com/docs/components/button
+- shadcn/ui Card: https://ui.shadcn.com/docs/components/card
+- shadcn/ui Dialog: https://ui.shadcn.com/docs/components/dialog
+- shadcn/ui Table: https://ui.shadcn.com/docs/components/table
+- Tailwind Docs: https://tailwindcss.com/docs

@@ -1,7 +1,7 @@
 ---
 name: react-patterns
 description: React component patterns, TypeScript interfaces, naming conventions, export/import standards. Use when creating React components, defining props, or organizing component files.
-allowed-tools: Read, Grep, Glob
+allowed-tools: WebFetch, Read, Grep, Glob
 ---
 
 # React Standards
@@ -81,3 +81,10 @@ grep -r "cn(" components/ --include="*.tsx"
 - No index as key
 - No useEffect for data fetching (use Server Components)
 - No prop drilling (pass only what's needed)
+
+## Fetch Latest Docs When Needed
+
+If unsure about current best practices, fetch from:
+- React Hooks: https://react.dev/reference/react/hooks
+- React Components: https://react.dev/reference/react/components
+- TypeScript + React: https://react.dev/learn/typescript

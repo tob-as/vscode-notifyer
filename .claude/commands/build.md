@@ -180,6 +180,28 @@ The app is running. Please test it and let me know if there are any issues.
 Build complete! Your app is ready.
 ```
 
+## Phase 8: Build Report
+
+**After build completes (success or failure), generate a build report:**
+
+```
+Task tool with subagent_type: "build-reporter"
+
+Prompt:
+PROJECT: [project name]
+STACK: [Next.js / Python]
+
+Review the entire build conversation and create a comprehensive report documenting:
+- All errors encountered and how they were resolved
+- Agent coordination issues
+- User feedback and UX problems
+- Timeline of key events
+
+Save to ~/Projects/OriginalBody/tob-claude-setup/reports/[project-name]-build-report.md
+```
+
+**Purpose:** Documents build issues for framework improvement. Reports are stored in tob-claude-setup, not the project.
+
 ## DO NOT
 
 - Make design decisions (stack, features, UI style)
