@@ -11,6 +11,7 @@
       "Grep",
       "WebFetch",
       "WebSearch",
+      "Bash(find:*)",
       "Bash(ls:*)",
       "Bash(cat:*)",
       "Bash(pwd)",
