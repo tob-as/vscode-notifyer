@@ -218,24 +218,56 @@ interface [Entity] {
 ```
 ```
 
-## Phase 4: Final Message
+## Phase 4: Present Design Summary
 
-After writing files, output ONLY:
+After writing files, present a clear summary of the design:
 
 ```
-Design complete.
+# Design Complete
 
-Files created:
-- .design/spec.md
-- .design/contracts.md
+## App Overview
+[App name] - [one sentence description]
 
-Review the files, then run /build to create the application.
+## Tech Stack
+- Framework: [Next.js / Python / Hybrid]
+- Database: [Prisma + SQLite / SQLAlchemy + SQLite]
+- UI: [shadcn/ui + Tailwind / Pico CSS]
+
+## Entities
+- [Entity1]: [key fields]
+- [Entity2]: [key fields]
+
+## Pages
+- / - [description]
+- /[entity] - [description]
+- /[entity]/new - [description]
+...
+
+## Key Features
+- [Feature 1]
+- [Feature 2]
+- [Feature 3]
+...
+
+## Agent Plan
+[X] agents will run in parallel to build this.
+
+---
+
+Let me know if you'd like to change anything. When you're satisfied, run /build.
 ```
 
-**DO NOT:**
-- Summarize the design
-- Explain what you wrote
-- Ask if they want changes
-- Offer to modify anything
+## Phase 5: Design Iteration (if needed)
 
-Just the message above, then STOP.
+**If user requests changes:**
+1. Discuss and clarify what they want changed
+2. Update the relevant .design/ files
+3. Present updated summary
+4. Repeat until user is satisfied
+
+**The .design/ files are the source of truth.** Any changes discussed must be written to the files before user runs /build.
+
+**When user is satisfied:**
+```
+Design finalized. Run /build when ready.
+```
