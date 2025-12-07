@@ -147,57 +147,21 @@ To run:
 3. Open http://localhost:8000
 ```
 
-## Phase 6: QA (Optional)
+## Phase 6: QA
 
-**For production-ready apps, launch Testing and Design agents in parallel:**
+**Status:** TODO - QA agents not yet implemented
 
+**Planned approach:**
+- `qa-testing` agent: Playwright tests, bug detection, automated fixes
+- `qa-design` agent: Visual review, spacing/layout fixes, UX improvements
+
+**For now:** Skip this phase. User testing in Phase 7 serves as manual QA.
+
+**When implemented, workflow will be:**
 ```
 main (working app)
-  ├─ feature/qa-testing   (Testing Agent - Playwright)
-  └─ feature/qa-design    (Design Agent - UX improvements)
-```
-
-**Launch both in parallel:**
-
-**Testing Agent:**
-```
-Task tool with subagent_type: "general-purpose"
-run_in_background: true
-
-Prompt:
-You are the Testing Agent.
-
-BRANCH: feature/qa-testing
-1. git checkout -b feature/qa-testing
-2. Install Playwright
-3. Write tests for all pages and interactions
-4. Fix bugs found
-5. Commit fixes
-6. Report bugs found and fixed
-```
-
-**Design Agent:**
-```
-Task tool with subagent_type: "general-purpose"
-run_in_background: true
-
-Prompt:
-You are the Design Agent.
-
-BRANCH: feature/qa-design
-1. git checkout -b feature/qa-design
-2. Screenshot all pages
-3. Fix spacing, layout, visual issues
-4. Commit improvements
-5. Report changes made
-```
-
-**After both complete:**
-```bash
-git checkout main
-git merge feature/qa-testing
-git merge feature/qa-design
-git branch -d feature/qa-testing feature/qa-design
+  ├─ feature/qa-testing   (Testing Agent)
+  └─ feature/qa-design    (Design Agent)
 ```
 
 ## Phase 7: User Testing

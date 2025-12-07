@@ -72,13 +72,19 @@ LOOP until all gaps are filled:
 
 **IMMEDIATELY after questions are answered, write files. No summary, no confirmation.**
 
+**Use the template matching the chosen stack (Next.js OR Python).**
+
 ### Create .design/ folder
 
 ```bash
 mkdir -p .design
 ```
 
-### Write .design/spec.md
+---
+
+## NEXT.JS STACK TEMPLATES
+
+### Write .design/spec.md (Next.js)
 
 ```markdown
 # Design Spec: [App Name]
@@ -90,9 +96,9 @@ mkdir -p .design
 - **Target Users:** [who uses this]
 
 ## Tech Stack
-- **Framework:** [Next.js / Python FastAPI / Hybrid]
-- **Database:** [Prisma + SQLite / SQLAlchemy + SQLite]
-- **UI:** [shadcn/ui + Tailwind / Pico CSS]
+- **Framework:** Next.js 15 (App Router)
+- **Database:** Prisma + SQLite
+- **UI:** shadcn/ui + Tailwind CSS
 - **Rationale:** [brief why]
 
 ## Entities
@@ -102,8 +108,7 @@ mkdir -p .design
 - createdAt: DateTime
 - updatedAt: DateTime
 - [field]: [type]
-- [field]: [type]
-- [relation]: [Entity2]
+- [relation]: [Entity2]?
 
 ### [Entity2]
 ...
@@ -122,7 +127,6 @@ mkdir -p .design
 - [ ] [Feature 1]
 - [ ] [Feature 2]
 - [ ] [Feature 3]
-...
 
 ## UI/UX Decisions
 - **Layout:** [sidebar / top nav / etc.]
@@ -132,16 +136,17 @@ mkdir -p .design
 
 ## Agent Execution Plan
 
-Launch these agents in parallel:
-
-| Agent | Responsibility | Files |
+| Agent | subagent_type | Files |
 |-------|---------------|-------|
-| UI Setup | shadcn/ui components | components/ui/* |
-| Prisma Schema | Database schema | prisma/schema.prisma, lib/db.ts |
-| Integration | Config files | package.json, layout.tsx, configs |
-| Component | Shared components | components/layout/*, components/[entity]/* |
-| Page ([entity1]) | [Entity1] pages | app/[entity1]/** |
-| Page ([entity2]) | [Entity2] pages | app/[entity2]/** |
+| UI Setup | ui-setup | components/ui/* |
+| Prisma Schema | prisma-schema | prisma/schema.prisma, lib/db.ts |
+| Integration | integration-nextjs | package.json, app/layout.tsx, configs |
+| [Entity1] Components | nextjs-component | components/[entity1]/* |
+| [Entity2] Components | nextjs-component | components/[entity2]/* |
+| Layout Components | nextjs-component | components/layout/* |
+| [Entity1] Pages | nextjs-page | app/[entity1]/** |
+| [Entity2] Pages | nextjs-page | app/[entity2]/** |
+| Home Page | nextjs-page | app/page.tsx |
 
 ## Out of Scope
 
@@ -149,14 +154,12 @@ Launch these agents in parallel:
 - [Explicitly excluded feature 2]
 ```
 
-### Write .design/contracts.md
+### Write .design/contracts.md (Next.js)
 
 ```markdown
 # Component Contracts
 
 ## shadcn/ui Components Required
-
-Based on the design, these shadcn/ui components are needed:
 
 | Component | Exports Required |
 |-----------|-----------------|
@@ -164,7 +167,7 @@ Based on the design, these shadcn/ui components are needed:
 | Card | Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter |
 | Input | Input |
 | Label | Label |
-| [etc.] | [exports] |
+| [add as needed] | [exports] |
 
 ## Custom Components
 
@@ -186,8 +189,6 @@ Based on the design, these shadcn/ui components are needed:
 - **Props:** `{ [entity]?: [EntityType], onSubmit: (data: FormData) => void }`
 - **Behavior:** [description]
 
-[Add all custom components needed]
-
 ## Page Components
 
 ### Home Page (/)
@@ -202,13 +203,10 @@ Based on the design, these shadcn/ui components are needed:
 - **Data:** Fetch all [entities]
 - **Components Used:** [EntityName]Card, Button
 
-[Add all pages]
-
 ## Shared Types
 
 ```typescript
 // types/index.ts
-
 interface [Entity] {
   id: string;
   createdAt: Date;
@@ -216,6 +214,138 @@ interface [Entity] {
   [field]: [type];
 }
 ```
+```
+
+---
+
+## PYTHON STACK TEMPLATES
+
+### Write .design/spec.md (Python)
+
+```markdown
+# Design Spec: [App Name]
+
+## Overview
+- **Description:** [one paragraph]
+- **App Type:** [dashboard / CRUD / etc.]
+- **Complexity:** [simple / medium / complex]
+- **Target Users:** [who uses this]
+
+## Tech Stack
+- **Framework:** FastAPI + Jinja2
+- **Database:** SQLAlchemy + SQLite
+- **UI:** Pico CSS (dark mode)
+- **Rationale:** [brief why]
+
+## Entities
+
+### [Entity1]
+- id: Integer (primary key, auto)
+- created_at: DateTime
+- [field]: [type]
+- [relation]: relationship([Entity2])
+
+### [Entity2]
+...
+
+## Pages & Routes
+
+| Route | Method | Purpose | Template |
+|-------|--------|---------|----------|
+| / | GET | [description] | index.html |
+| /[entity] | GET | List all | [entity]/list.html |
+| /[entity] | POST | Create new | redirect |
+| /[entity]/new | GET | Create form | [entity]/form.html |
+| /[entity]/{id} | GET | Detail view | [entity]/detail.html |
+| /[entity]/{id}/edit | GET | Edit form | [entity]/form.html |
+| /[entity]/{id} | POST | Update | redirect |
+| /[entity]/{id}/delete | POST | Delete | redirect |
+
+## Features Checklist
+
+- [ ] [Feature 1]
+- [ ] [Feature 2]
+- [ ] [Feature 3]
+
+## UI/UX Decisions
+- **Layout:** [sidebar in nav / top nav only]
+- **Style:** [minimal / dashboard]
+- **Theme:** dark (Pico CSS default)
+
+## Agent Execution Plan
+
+| Agent | subagent_type | Files |
+|-------|---------------|-------|
+| Data | data | db/database.py, models/*.py |
+| Logic | logic | routes/__init__.py, routes/[entity].py |
+| UI Base | ui-base | templates/base.html |
+| UI Pages ([entity1]) | ui-page | templates/[entity1]/*.html |
+| UI Pages ([entity2]) | ui-page | templates/[entity2]/*.html |
+| Integration | integration | main.py, pyproject.toml, README.md |
+
+## Out of Scope
+
+- [Explicitly excluded feature 1]
+- [Explicitly excluded feature 2]
+```
+
+### Write .design/contracts.md (Python)
+
+```markdown
+# Component Contracts
+
+## Database Models
+
+### [Entity1]
+- **File:** models/[entity1].py
+- **Table:** [entity1]s
+- **Fields:** id, created_at, [field1], [field2], [relation]_id
+- **Relationships:** [Entity2] (many-to-one)
+
+### [Entity2]
+- **File:** models/[entity2].py
+- **Table:** [entity2]s
+- **Fields:** id, [field1], [field2]
+- **Relationships:** [Entity1]s (one-to-many)
+
+## Route Modules
+
+### [entity1] routes
+- **File:** routes/[entity1].py
+- **Prefix:** /[entity1]
+- **Endpoints:**
+  - GET "" → list all, render list.html
+  - GET "/new" → render form.html (empty)
+  - POST "" → create, redirect to list
+  - GET "/{id}" → render detail.html
+  - GET "/{id}/edit" → render form.html (populated)
+  - POST "/{id}" → update, redirect to detail
+  - POST "/{id}/delete" → delete, redirect to list
+
+## Templates
+
+### base.html
+- **File:** templates/base.html
+- **Blocks:** title, nav, content
+- **Nav:** App name + links to main sections
+
+### [entity]/list.html
+- **File:** templates/[entity]/list.html
+- **Extends:** base.html
+- **Context:** { items: list[[Entity]] }
+- **Elements:** Table with items, link to new, link to detail
+
+### [entity]/form.html
+- **File:** templates/[entity]/form.html
+- **Extends:** base.html
+- **Context:** { item?: [Entity] }
+- **Elements:** Form fields, submit button
+
+### [entity]/detail.html
+- **File:** templates/[entity]/detail.html
+- **Extends:** base.html
+- **Context:** { item: [Entity] }
+- **Elements:** Display fields, edit/delete buttons
 ```
 
 ## Phase 4: Present Design Summary
