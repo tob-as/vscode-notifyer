@@ -46,17 +46,34 @@ STOP. Do not proceed.
 
 Launch ALL agents specified in that table, in parallel, using a single message with multiple Task tool calls.
 
-**For each agent in the table:**
+### Next.js Stack Agents
+
+Use these named agents (skills are auto-loaded via frontmatter):
+
+| Agent | subagent_type | Skills Auto-Loaded |
+|-------|---------------|-------------------|
+| UI Setup | `ui-setup` | tailwind-patterns |
+| Prisma Schema | `prisma-schema` | prisma-patterns |
+| Integration | `integration-nextjs` | nextjs-patterns, tailwind-patterns |
+| Component | `nextjs-component` | react-patterns, tailwind-patterns, nextjs-patterns |
+| Page | `nextjs-page` | nextjs-patterns, react-patterns, tailwind-patterns, prisma-patterns |
+
+### Python Stack Agents
+
+| Agent | subagent_type | Skills Auto-Loaded |
+|-------|---------------|-------------------|
+| Data | `data` | sqlalchemy-patterns |
+| Logic | `logic` | fastapi-patterns, sqlalchemy-patterns |
+| UI Base | `ui-base` | ui-design-patterns |
+| UI Page | `ui-page` | ui-design-patterns, fastapi-patterns |
+| Integration | `integration` | fastapi-patterns, sqlalchemy-patterns |
+
+### Launch Pattern
 
 ```
-Task tool with subagent_type: "general-purpose"
-model: [use "sonnet" for simple agents like UI Setup, Integration; default for others]
+Task tool with subagent_type: "[agent-name-from-table]"
 
 Prompt:
-You are the [Agent Name] agent.
-
-[Insert contents of corresponding .claude/agents/[agent].md]
-
 DESIGN SPEC:
 [Insert relevant section from .design/spec.md]
 
@@ -69,7 +86,7 @@ FILE OWNERSHIP (create ONLY these):
 Execute exactly as specified. Do not add features or change the design.
 ```
 
-**Agent inherits skills automatically** (nextjs-patterns, react-patterns, etc.)
+**Skills are auto-loaded** from the agent's frontmatter - no need to insert standards manually.
 
 **OPTIMIZATION:** While agents work, start package installation in background:
 - Next.js: `npm install &`

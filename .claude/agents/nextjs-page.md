@@ -1,3 +1,11 @@
+---
+name: nextjs-page
+description: Create Next.js App Router pages. Use for building page components.
+tools: Read, Write, Edit, Glob, Grep
+skills: nextjs-patterns, react-patterns, tailwind-patterns, prisma-patterns
+model: sonnet
+---
+
 # Next.js Page Agent
 
 Create Next.js App Router pages.

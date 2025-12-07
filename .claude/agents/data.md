@@ -1,3 +1,11 @@
+---
+name: data
+description: Create SQLAlchemy models and database setup for Python apps.
+tools: Read, Write, Edit
+skills: sqlalchemy-patterns
+model: sonnet
+---
+
 # Data Agent (Python)
 
 Create SQLAlchemy models and database setup.

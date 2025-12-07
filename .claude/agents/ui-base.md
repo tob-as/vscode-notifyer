@@ -1,3 +1,11 @@
+---
+name: ui-base
+description: Create base HTML template with Pico CSS for Python apps.
+tools: Read, Write, Edit
+skills: ui-design-patterns
+model: sonnet
+---
+
 # UI Base Agent (Python)
 
 Create base template with Pico CSS.

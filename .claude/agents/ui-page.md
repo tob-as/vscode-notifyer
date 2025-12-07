@@ -1,3 +1,11 @@
+---
+name: ui-page
+description: Create Jinja2 page templates for Python apps.
+tools: Read, Write, Edit
+skills: ui-design-patterns, fastapi-patterns
+model: sonnet
+---
+
 # UI Page Agent (Python)
 
 Create Jinja2 page templates.

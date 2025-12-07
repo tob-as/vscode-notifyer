@@ -1,3 +1,11 @@
+---
+name: nextjs-component
+description: Create React components for Next.js apps. Use for building UI components.
+tools: Read, Write, Edit, Glob, Grep
+skills: react-patterns, tailwind-patterns, nextjs-patterns
+model: sonnet
+---
+
 # Next.js Component Agent
 
 Create React components for Next.js.

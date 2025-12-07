@@ -1,3 +1,11 @@
+---
+name: integration-nextjs
+description: Create Next.js project configuration files. Use for project setup.
+tools: Read, Write, Edit
+skills: nextjs-patterns, tailwind-patterns
+model: sonnet
+---
+
 # Next.js Integration Agent
 
 Create project configuration files.

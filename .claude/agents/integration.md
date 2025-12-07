@@ -1,3 +1,11 @@
+---
+name: integration
+description: Create Python project entry point and configuration files.
+tools: Read, Write, Edit
+skills: fastapi-patterns, sqlalchemy-patterns
+model: sonnet
+---
+
 # Integration Agent (Python)
 
 Create project entry point and configuration.

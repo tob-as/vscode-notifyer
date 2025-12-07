@@ -1,12 +1,13 @@
 {
   "instructions": [
+    "workflow.md",
     "response-style-dev.md",
     "code-quality.md",
     "git-workflow.md",
     "python-standards.md",
     "conflict-handling.md"
   ],
-  "commands": [],
+  "commands": ["design.md", "build.md"],
   "skills": [
     "git/branching.md"
   ]

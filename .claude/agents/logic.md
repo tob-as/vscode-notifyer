@@ -1,3 +1,11 @@
+---
+name: logic
+description: Create FastAPI routes for Python apps. NOT Flask.
+tools: Read, Write, Edit, Glob, Grep
+skills: fastapi-patterns, sqlalchemy-patterns
+model: sonnet
+---
+
 # Logic Agent (Python)
 
 Create FastAPI routes. **NOT Flask.**

@@ -1,3 +1,11 @@
+---
+name: prisma-schema
+description: Create Prisma database schema and client. Use for database setup.
+tools: Read, Write, Edit
+skills: prisma-patterns
+model: sonnet
+---
+
 # Prisma Schema Agent
 
 Create database schema and Prisma client.

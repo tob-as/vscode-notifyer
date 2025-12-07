@@ -1,3 +1,11 @@
+---
+name: ui-setup
+description: Create shadcn/ui base components. Use for setting up UI component library.
+tools: Read, Write, Edit
+skills: tailwind-patterns
+model: sonnet
+---
+
 # UI Setup Agent
 
 Create shadcn/ui base components.
