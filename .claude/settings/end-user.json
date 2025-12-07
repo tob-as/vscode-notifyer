@@ -12,6 +12,7 @@
       "Bash(git checkout:*)",
       "Bash(mkdir:*)",
       "Bash(python:*)",
+      "Bash(python3:*)",
       "Bash(uv:*)",
       "Bash(uvicorn:*)",
       "Bash(npm:*)",
@@ -20,13 +21,11 @@
       "Bash(curl:*)",
       "Bash(find:*)",
       "Bash(ls:*)",
+      "Bash(cd:*)",
       "Bash(grep:*)",
       "Bash(sed:*)",
       "Bash(test:*)",
-      "Bash(cp:*)",
-      "Bash(mkdir:*)",
-      "Bash(python:*)",
-      "Bash(python3:*)"
+      "Bash(cp:*)"
     ],
     "ask": [
       "Read(.env)",
