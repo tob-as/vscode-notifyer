@@ -22,7 +22,10 @@
       "Bash(find:*)",
       "Bash(ls:*)",
       "Bash(test:*)",
-      "Bash(cp:*)"
+      "Bash(cp:*)",
+      "Bash(mkdir:*)",
+      "Bash(python:*)",
+      "Bash(python3:*)"
     ],
     "ask": [
       "Read(.env)",
