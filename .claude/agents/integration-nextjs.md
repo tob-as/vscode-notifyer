@@ -51,9 +51,9 @@ Create ONLY:
     "postinstall": "prisma generate"
   },
   "dependencies": {
-    "next": "14.2.0",
-    "react": "^18",
-    "react-dom": "^18",
+    "next": "^16.0.0",
+    "react": "^19",
+    "react-dom": "^19",
     "@prisma/client": "^5.14.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
@@ -62,8 +62,8 @@ Create ONLY:
   },
   "devDependencies": {
     "typescript": "^5",
-    "@types/node": "^20",
-    "@types/react": "^18",
+    "@types/node": "^22",
+    "@types/react": "^19",
     "tailwindcss": "^3.4.1",
     "autoprefixer": "^10.0.1",
     "postcss": "^8",
