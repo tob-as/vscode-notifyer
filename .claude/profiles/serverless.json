@@ -1,0 +1,14 @@
+{
+  "instructions": [
+    "workflow.md",
+    "cloudflare-workers.md",
+    "code-quality.md",
+    "git-workflow.md",
+    "conflict-handling.md"
+  ],
+  "commands": ["design.md", "build.md"],
+  "skills": [
+    "cloudflare-workers-patterns",
+    "git/branching.md"
+  ]
+}

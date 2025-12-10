@@ -1,15 +1,63 @@
 #!/bin/bash
 # setup-claude.sh - Initialize or switch TOB Claude config in any project
-# Usage: setup-claude.sh [profile]
-# Run this from your project directory
+# Usage: setup-claude.sh [profile] [options]
+#
+# Profiles:
+#   end-user   - For non-developers building apps (default)
+#   developer  - For developers
+#   serverless - For Cloudflare Workers projects
+#
+# Serverless options:
+#   --type=ui|api     Worker type (default: ui)
+#   --with-kv         Add KV storage
+#   --with-d1         Add D1 database
+#   --with-auth       Add user authentication (workers-users)
+#
+# Examples:
+#   setup-claude.sh serverless
+#   setup-claude.sh serverless --type=api
+#   setup-claude.sh serverless --with-d1 --with-auth
 
 set -e
 
 # Get the directory where this script lives (= tob-claude-setup root)
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
+# Parse arguments
+PROFILE=""
+WORKER_TYPE="ui"
+WITH_KV=false
+WITH_D1=false
+WITH_AUTH=false
+
+for arg in "$@"; do
+  case $arg in
+    --type=*)
+      WORKER_TYPE="${arg#*=}"
+      ;;
+    --with-kv)
+      WITH_KV=true
+      ;;
+    --with-d1)
+      WITH_D1=true
+      ;;
+    --with-auth)
+      WITH_AUTH=true
+      WITH_KV=true  # Auth requires KV for sessions
+      WITH_D1=true  # Auth requires D1 for users
+      ;;
+    -*)
+      echo "Unknown option: $arg"
+      exit 1
+      ;;
+    *)
+      PROFILE="$arg"
+      ;;
+  esac
+done
+
 # Default profile
-PROFILE="${1:-end-user}"
+PROFILE="${PROFILE:-end-user}"
 
 # Check profile exists
 MANIFEST="$SCRIPT_DIR/.claude/profiles/$PROFILE.json"
@@ -188,6 +236,103 @@ done
 
 # Store active profile
 echo "$PROFILE" > .claude/active-profile
+
+# ============================================================
+# SERVERLESS PROFILE: Copy templates and setup project
+# ============================================================
+if [ "$PROFILE" = "serverless" ]; then
+  TEMPLATE_DIR="$SCRIPT_DIR/.claude/templates/serverless"
+  PROJECT_NAME=$(basename "$PWD")
+  WORKER_NAME=$(echo "$PROJECT_NAME" | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
+  APP_NAME="$PROJECT_NAME"
+
+  echo ""
+  echo "Setting up Cloudflare Workers project..."
+  echo "  Worker name: $WORKER_NAME"
+  echo "  Type: $WORKER_TYPE"
+
+  # Copy base templates (only if files don't exist)
+  copy_if_missing() {
+    local src="$1"
+    local dest="$2"
+    if [ ! -e "$dest" ]; then
+      mkdir -p "$(dirname "$dest")"
+      cp "$src" "$dest"
+      echo "  ✓ Created: $dest"
+    fi
+  }
+
+  # Copy base templates
+  if [ -d "$TEMPLATE_DIR/base" ]; then
+    # Workflows
+    copy_if_missing "$TEMPLATE_DIR/base/.github/workflows/deploy-cloudflare.yml" ".github/workflows/deploy-cloudflare.yml"
+    copy_if_missing "$TEMPLATE_DIR/base/.github/workflows/deploy-cloudflare-access.yml" ".github/workflows/deploy-cloudflare-access.yml"
+    copy_if_missing "$TEMPLATE_DIR/base/.github/app-config.yml" ".github/app-config.yml"
+
+    # Terraform
+    copy_if_missing "$TEMPLATE_DIR/base/infra/cloudflare-access/main.tf" "infra/cloudflare-access/main.tf"
+    copy_if_missing "$TEMPLATE_DIR/base/infra/cloudflare-access/variables.tf" "infra/cloudflare-access/variables.tf"
+
+    # Wrangler config
+    copy_if_missing "$TEMPLATE_DIR/base/wrangler.toml" "wrangler.toml"
+
+    # Docs
+    copy_if_missing "$TEMPLATE_DIR/base/docs/SECURITY.md" "docs/SECURITY.md"
+  fi
+
+  # Copy worker type template
+  WORKER_TEMPLATE_DIR="$TEMPLATE_DIR/worker-$WORKER_TYPE"
+  if [ -d "$WORKER_TEMPLATE_DIR" ]; then
+    copy_if_missing "$WORKER_TEMPLATE_DIR/src/index.js" "src/index.js"
+  else
+    # Fallback to base
+    copy_if_missing "$TEMPLATE_DIR/base/src/index.js" "src/index.js"
+  fi
+
+  # Replace placeholders in all created files
+  replace_placeholders() {
+    local file="$1"
+    if [ -f "$file" ]; then
+      # Use different sed syntax for macOS vs Linux
+      if [[ "$OSTYPE" == "darwin"* ]]; then
+        sed -i '' "s/{{WORKER_NAME}}/$WORKER_NAME/g" "$file" 2>/dev/null || true
+        sed -i '' "s/{{APP_NAME}}/$APP_NAME/g" "$file" 2>/dev/null || true
+      else
+        sed -i "s/{{WORKER_NAME}}/$WORKER_NAME/g" "$file" 2>/dev/null || true
+        sed -i "s/{{APP_NAME}}/$APP_NAME/g" "$file" 2>/dev/null || true
+      fi
+    fi
+  }
+
+  # Replace placeholders in all template files
+  for file in wrangler.toml src/index.js .github/workflows/*.yml infra/cloudflare-access/*.tf docs/SECURITY.md; do
+    replace_placeholders "$file"
+  done
+
+  # Add-ons info
+  if [ "$WITH_KV" = true ]; then
+    echo "  📦 KV storage: Add namespace ID to wrangler.toml"
+  fi
+  if [ "$WITH_D1" = true ]; then
+    echo "  📦 D1 database: Add database ID to wrangler.toml"
+  fi
+  if [ "$WITH_AUTH" = true ]; then
+    echo "  📦 Auth: See docs for workers-users integration"
+  fi
+
+  echo ""
+  echo "Next steps:"
+  echo "  1. Update infra/cloudflare-access/main.tf with your:"
+  echo "     - Cloudflare subdomain ({{CLOUDFLARE_SUBDOMAIN}})"
+  echo "     - Email domain ({{EMAIL_DOMAIN}})"
+  echo "     - Developer emails for dev environment"
+  echo "  2. Add GitHub secrets:"
+  echo "     - CLOUDFLARE_API_TOKEN"
+  echo "     - CLOUDFLARE_ACCESS_TOKEN"
+  echo "     - CLOUDFLARE_ACCOUNT_ID"
+  echo "  3. Run: wrangler dev"
+  echo ""
+fi
 
 # Different message for init vs switch
 if [ "$IS_NEW_SETUP" = true ]; then

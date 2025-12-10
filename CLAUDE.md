@@ -1,6 +1,7 @@
 # Team Standards
-@~/Projects/OriginalBody/tob-claude-setup/.claude/instructions/response-style-user.md
-@~/Projects/OriginalBody/tob-claude-setup/.claude/instructions/conflict-handling.md
+@~/workspace/tob-claude-setup/.claude/instructions/workflow.md
+@~/workspace/tob-claude-setup/.claude/instructions/response-style-user.md
+@~/workspace/tob-claude-setup/.claude/instructions/conflict-handling.md
 
 # Project-Specific
 
