@@ -1,0 +1,10 @@
+name = "{{WORKER_NAME}}-prod"
+main = "src/index.js"
+compatibility_date = "2024-01-01"
+workers_dev = true
+
+[env.dev]
+name = "{{WORKER_NAME}}-dev"
+
+[env.staging]
+name = "{{WORKER_NAME}}-staging"

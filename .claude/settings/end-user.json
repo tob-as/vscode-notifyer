@@ -1,0 +1,40 @@
+{
+  "model": "opus",
+  "env": {
+    "MAX_THINKING_TOKENS": "10000"
+  },
+  "permissions": {
+    "allow": [
+      "Write",
+      "Edit",
+      "MultiEdit",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git checkout:*)",
+      "Bash(mkdir:*)",
+      "Bash(python:*)",
+      "Bash(python3:*)",
+      "Bash(uv:*)",
+      "Bash(uvicorn:*)",
+      "Bash(npm:*)",
+      "Bash(npx:*)",
+      "Bash(node:*)",
+      "Bash(curl:*)",
+      "Bash(find:*)",
+      "Bash(ls:*)",
+      "Bash(cd:*)",
+      "Bash(grep:*)",
+      "Bash(sed:*)",
+      "Bash(test:*)",
+      "Bash(cp:*)"
+    ],
+    "ask": [
+      "Read(.env)",
+      "Read(*secret*)",
+      "Read(*credential*)"
+    ],
+    "deny": [
+      "Bash(docker:*)"
+    ]
+  }
+}

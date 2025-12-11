@@ -1,0 +1,13 @@
+# macOS
+.DS_Store
+
+# Local settings (not committed)
+.claude/settings.local.json
+
+# Editor
+.vscode/
+.idea/
+
+# Node (for Next.js branch)
+node_modules/
+.next/

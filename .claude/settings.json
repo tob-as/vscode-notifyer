@@ -1,0 +1,85 @@
+{
+  "model": "opus",
+  "permissions": {
+    "allow": [
+      "Bash(cat:*)",
+      "Bash(cd:*)",
+      "Bash(cp:*)",
+      "Bash(curl:*)",
+      "Bash(docker compose down:*)",
+      "Bash(docker compose up:*)",
+      "Bash(docker compose:*)",
+      "Bash(docker logs:*)",
+      "Bash(docker ps:*)",
+      "Bash(docker start:*)",
+      "Bash(docker stop:*)",
+      "Bash(echo:*)",
+      "Bash(find:*)",
+      "Bash(git add:*)",
+      "Bash(git branch:*)",
+      "Bash(git checkout:*)",
+      "Bash(git commit:*)",
+      "Bash(git diff:*)",
+      "Bash(git fetch:*)",
+      "Bash(git init:*)",
+      "Bash(git pull:*)",
+      "Bash(git status)",
+      "Bash(grep:*)",
+      "Bash(head:*)",
+      "Bash(ls:*)",
+      "Bash(mkdir -p:*)",
+      "Bash(mkdir:*)",
+      "Bash(node:*)",
+      "Bash(npm:*)",
+      "Bash(npx:*)",
+      "Bash(pwd)",
+      "Bash(python3:*)",
+      "Bash(python:*)",
+      "Bash(sed:*)",
+      "Bash(tail:*)",
+      "Bash(test:*)",
+      "Bash(uv:*)",
+      "Bash(uvicorn:*)",
+      "Edit",
+      "Glob",
+      "Grep",
+      "MultiEdit",
+      "Read",
+      "WebFetch",
+      "WebSearch",
+      "Write"
+    ],
+    "ask": [
+      "Bash(git push:*)",
+      "Bash(rm:*)",
+      "Read(*credential*)",
+      "Read(*secret*)",
+      "Read(.env)"
+    ],
+    "deny": [
+      "Bash(chmod 777:*)",
+      "Bash(docker:*)",
+      "Bash(sudo:*)"
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/statusline.sh"
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/read-references-reminder.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  },
+  "env": {
+    "MAX_THINKING_TOKENS": "10000"
+  }
+}

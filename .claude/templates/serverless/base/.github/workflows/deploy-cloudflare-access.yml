@@ -1,0 +1,120 @@
+name: Deploy Cloudflare Access Policies
+
+on:
+  push:
+    branches:
+      - develop
+      - staging
+      - main
+    paths:
+      - 'infra/cloudflare-access/**'
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    name: Setup Environment
+    outputs:
+      environment: ${{ steps.env.outputs.environment }}
+      worker_name: ${{ steps.env.outputs.worker_name }}
+      app_name: ${{ steps.env.outputs.app_name }}
+    steps:
+      - name: Determine environment
+        id: env
+        run: |
+          case "${{ github.ref_name }}" in
+            develop)
+              echo "environment=dev" >> $GITHUB_OUTPUT
+              echo "worker_name={{WORKER_NAME}}-dev" >> $GITHUB_OUTPUT
+              echo "app_name={{APP_NAME}} (dev)" >> $GITHUB_OUTPUT
+              ;;
+            staging)
+              echo "environment=staging" >> $GITHUB_OUTPUT
+              echo "worker_name={{WORKER_NAME}}-staging" >> $GITHUB_OUTPUT
+              echo "app_name={{APP_NAME}} (staging)" >> $GITHUB_OUTPUT
+              ;;
+            main)
+              echo "environment=prod" >> $GITHUB_OUTPUT
+              echo "worker_name={{WORKER_NAME}}-prod" >> $GITHUB_OUTPUT
+              echo "app_name={{APP_NAME}} (prod)" >> $GITHUB_OUTPUT
+              ;;
+          esac
+
+  terraform:
+    runs-on: ubuntu-latest
+    name: Terraform Apply (${{ needs.setup.outputs.environment }})
+    needs: setup
+    defaults:
+      run:
+        working-directory: infra/cloudflare-access
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.0
+          terraform_wrapper: false
+
+      - name: Restore Terraform State
+        id: cache-restore
+        uses: actions/cache/restore@v4
+        with:
+          path: infra/cloudflare-access/terraform.tfstate
+          key: terraform-state-cloudflare-access-${{ needs.setup.outputs.environment }}
+          restore-keys: |
+            terraform-state-cloudflare-access-${{ needs.setup.outputs.environment }}
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Import existing application if needed
+        run: |
+          set +e
+          terraform state show cloudflare_zero_trust_access_application.worker > /dev/null 2>&1
+          APP_EXISTS=$?
+          set -e
+
+          if [ "$APP_EXISTS" -ne 0 ]; then
+            echo "Application not in state, attempting to import..."
+            APP_RESPONSE=$(curl -s -X GET "https://api.cloudflare.com/client/v4/accounts/${{ secrets.CLOUDFLARE_ACCOUNT_ID }}/access/apps" \
+              -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_ACCESS_TOKEN }}" \
+              -H "Content-Type: application/json")
+
+            APP_NAME="${{ needs.setup.outputs.app_name }}"
+            APP_ID=$(echo "$APP_RESPONSE" | jq -r --arg name "$APP_NAME" '.result[] | select(.name == $name) | .id')
+
+            if [ -n "$APP_ID" ] && [ "$APP_ID" != "null" ]; then
+              echo "Importing application: $APP_ID"
+              terraform import cloudflare_zero_trust_access_application.worker "${{ secrets.CLOUDFLARE_ACCOUNT_ID }}/$APP_ID"
+            else
+              echo "No existing application found with name: $APP_NAME"
+            fi
+          else
+            echo "Application already in state"
+          fi
+        env:
+          TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_ACCESS_TOKEN }}
+          TF_VAR_cloudflare_account_id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          TF_VAR_environment: ${{ needs.setup.outputs.environment }}
+
+      - name: Terraform Plan
+        run: terraform plan -out=tfplan
+        env:
+          TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_ACCESS_TOKEN }}
+          TF_VAR_cloudflare_account_id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          TF_VAR_environment: ${{ needs.setup.outputs.environment }}
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve tfplan
+        env:
+          TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_ACCESS_TOKEN }}
+          TF_VAR_cloudflare_account_id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          TF_VAR_environment: ${{ needs.setup.outputs.environment }}
+
+      - name: Save Terraform State
+        uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: infra/cloudflare-access/terraform.tfstate
+          key: terraform-state-cloudflare-access-${{ needs.setup.outputs.environment }}-${{ github.run_id }}

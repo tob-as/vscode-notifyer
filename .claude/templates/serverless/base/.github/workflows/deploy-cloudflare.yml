@@ -1,0 +1,188 @@
+name: Deploy to Cloudflare Workers
+
+on:
+  push:
+    branches:
+      - develop
+      - staging
+      - main
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    name: Setup Environment
+    outputs:
+      environment: ${{ steps.env.outputs.environment }}
+      worker_name: ${{ steps.env.outputs.worker_name }}
+    steps:
+      - name: Determine environment
+        id: env
+        run: |
+          case "${{ github.ref_name }}" in
+            develop)
+              echo "environment=dev" >> $GITHUB_OUTPUT
+              echo "worker_name={{WORKER_NAME}}-dev" >> $GITHUB_OUTPUT
+              ;;
+            staging)
+              echo "environment=staging" >> $GITHUB_OUTPUT
+              echo "worker_name={{WORKER_NAME}}-staging" >> $GITHUB_OUTPUT
+              ;;
+            main)
+              echo "environment=prod" >> $GITHUB_OUTPUT
+              echo "worker_name={{WORKER_NAME}}-prod" >> $GITHUB_OUTPUT
+              ;;
+          esac
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Environment: $(grep environment= $GITHUB_OUTPUT | cut -d= -f2)"
+
+  security-check:
+    runs-on: ubuntu-latest
+    name: Security Check
+    needs: setup
+    outputs:
+      visibility: ${{ steps.config.outputs.visibility }}
+      access_protected: ${{ steps.check-access.outputs.protected }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read app config
+        id: config
+        run: |
+          # Check if this is a Cloudflare Worker project
+          if [ ! -f "wrangler.toml" ]; then
+            echo "No wrangler.toml found - not a Cloudflare Worker project"
+            echo "visibility=skip" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          if [ -f ".github/app-config.yml" ]; then
+            VISIBILITY=$(grep -E "^visibility:" .github/app-config.yml | awk '{print $2}')
+            echo "visibility=$VISIBILITY" >> $GITHUB_OUTPUT
+            echo "App visibility: $VISIBILITY"
+          else
+            echo "visibility=internal" >> $GITHUB_OUTPUT
+            echo "No config found, defaulting to internal (secure by default)"
+          fi
+
+      - name: Check Cloudflare Access protection
+        id: check-access
+        if: steps.config.outputs.visibility != 'skip' && steps.config.outputs.visibility != 'public'
+        run: |
+          WORKER_NAME="${{ needs.setup.outputs.worker_name }}"
+          echo "Worker name: $WORKER_NAME"
+
+          # Get account subdomain from Cloudflare API
+          SUBDOMAIN_RESPONSE=$(curl -s -X GET "https://api.cloudflare.com/client/v4/accounts/${{ secrets.CLOUDFLARE_ACCOUNT_ID }}/workers/subdomain" \
+            -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
+            -H "Content-Type: application/json")
+          SUBDOMAIN=$(echo "$SUBDOMAIN_RESPONSE" | jq -r '.result.subdomain')
+          echo "Account subdomain: $SUBDOMAIN"
+
+          # Check if Access Application exists for this worker
+          RESPONSE=$(curl -s -X GET "https://api.cloudflare.com/client/v4/accounts/${{ secrets.CLOUDFLARE_ACCOUNT_ID }}/access/apps" \
+            -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_ACCESS_TOKEN }}" \
+            -H "Content-Type: application/json")
+
+          # Look for an app protecting this worker's domain
+          WORKER_DOMAIN="${WORKER_NAME}.${SUBDOMAIN}.workers.dev"
+          echo "Looking for Access protection on: $WORKER_DOMAIN"
+
+          PROTECTED=$(echo "$RESPONSE" | jq -r --arg domain "$WORKER_DOMAIN" \
+            '.result[] | select(.domain == $domain) | .id' | head -1)
+
+          if [ -n "$PROTECTED" ] && [ "$PROTECTED" != "null" ]; then
+            echo "protected=true" >> $GITHUB_OUTPUT
+            echo "Access Application found: $PROTECTED"
+          else
+            echo "protected=false" >> $GITHUB_OUTPUT
+            echo "No Access Application found for $WORKER_DOMAIN"
+          fi
+
+      - name: Enforce security policy
+        run: |
+          VISIBILITY="${{ steps.config.outputs.visibility }}"
+          PROTECTED="${{ steps.check-access.outputs.protected }}"
+          ENVIRONMENT="${{ needs.setup.outputs.environment }}"
+
+          echo "========================================"
+          echo "SECURITY CHECK ($ENVIRONMENT)"
+          echo "========================================"
+          echo "Visibility: $VISIBILITY"
+          echo "Access Protected: $PROTECTED"
+          echo "========================================"
+
+          # Skip check if not a Cloudflare Worker or explicitly public
+          if [ "$VISIBILITY" = "skip" ]; then
+            echo "Not a Cloudflare Worker project - skipping security check"
+            exit 0
+          fi
+
+          if [ "$VISIBILITY" = "public" ]; then
+            echo "App marked as public - no Access protection required"
+            exit 0
+          fi
+
+          # For internal apps, require Access protection
+          if [ "$VISIBILITY" = "internal" ] && [ "$PROTECTED" != "true" ]; then
+            echo ""
+            echo "DEPLOYMENT BLOCKED"
+            echo ""
+            echo "This app is marked as 'internal' but has no Cloudflare Access protection."
+            echo ""
+            echo "To fix this, either:"
+            echo "1. Add Cloudflare Access protection in infra/cloudflare-access/main.tf"
+            echo "2. Change visibility to 'public' in .github/app-config.yml (not recommended)"
+            echo ""
+            exit 1
+          fi
+
+          echo "Security check passed - internal app is protected"
+
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy Worker (${{ needs.setup.outputs.environment }})
+    needs: [setup, security-check]
+    if: needs.security-check.result == 'success'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Inject environment badge
+        run: |
+          ENV="${{ needs.setup.outputs.environment }}"
+
+          # Badge colors: dev=red, staging=orange, prod=green
+          if [ "$ENV" = "dev" ]; then
+            COLOR="#ef4444"
+            LABEL="DEV"
+          elif [ "$ENV" = "staging" ]; then
+            COLOR="#f59e0b"
+            LABEL="STAGING"
+          else
+            COLOR="#22c55e"
+            LABEL="PROD"
+          fi
+
+          # Badge HTML/CSS to inject before </body>
+          BADGE_HTML="<!-- Environment Badge (injected by CI) --><style>.env-badge{position:fixed;bottom:16px;left:16px;background:${COLOR};color:#fff;padding:6px 14px;border-radius:6px;font-family:system-ui,sans-serif;font-size:12px;font-weight:700;letter-spacing:0.5px;box-shadow:0 2px 8px rgba(0,0,0,0.3);z-index:99999;opacity:0.9;pointer-events:none;}</style><div class=\"env-badge\">${LABEL}</div>"
+
+          # Find all JS files that contain </body> (embedded HTML) and inject badge
+          for file in $(grep -rl "</body>" --include="*.js" . 2>/dev/null); do
+            echo "Injecting badge into: $file"
+            sed -i "s|</body>|${BADGE_HTML}</body>|g" "$file"
+          done
+
+          # Also handle standalone HTML files
+          for file in $(grep -rl "</body>" --include="*.html" . 2>/dev/null); do
+            echo "Injecting badge into: $file"
+            sed -i "s|</body>|${BADGE_HTML}</body>|g" "$file"
+          done
+
+          echo "Badge injected for environment: $ENV"
+
+      - name: Deploy to Cloudflare Workers
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          # prod uses default config, dev/staging use --env flag
+          command: deploy ${{ needs.setup.outputs.environment != 'prod' && format('--env {0}', needs.setup.outputs.environment) || '' }}

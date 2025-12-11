@@ -1,0 +1,9 @@
+{
+  "instructions": [
+    "workflow.md",
+    "response-style-user.md",
+    "conflict-handling.md"
+  ],
+  "commands": ["design.md", "build.md"],
+  "skills": []
+}

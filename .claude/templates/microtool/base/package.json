@@ -1,0 +1,19 @@
+{
+  "name": "{{WORKER_NAME}}",
+  "private": true,
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "deploy": "turbo run deploy",
+    "deploy:dev": "turbo run deploy:dev",
+    "deploy:staging": "turbo run deploy:staging",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck"
+  },
+  "devDependencies": {
+    "turbo": "^2.0.0",
+    "typescript": "^5.7.0"
+  },
+  "packageManager": "pnpm@9.0.0"
+}

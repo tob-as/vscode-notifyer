@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(wrangler:*)",
+      "Bash(wrangler dev:*)",
+      "Bash(wrangler deploy:*)",
+      "Bash(wrangler pages:*)",
+      "Bash(npm:*)",
+      "Bash(npx:*)",
+      "Bash(pnpm:*)",
+      "Bash(turbo:*)",
+      "Bash(node:*)",
+      "Bash(vite:*)",
+      "Bash(terraform:*)"
+    ]
+  },
+  "env": {
+    "CLOUDFLARE_API_TOKEN": "",
+    "CLOUDFLARE_ACCOUNT_ID": ""
+  }
+}

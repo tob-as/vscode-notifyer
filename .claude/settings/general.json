@@ -1,0 +1,80 @@
+{
+  "model": "claude-sonnet-4-5-20250929",
+
+  "permissions": {
+    "allow": [
+      "Read",
+      "Write",
+      "Edit",
+      "MultiEdit",
+      "Glob",
+      "Grep",
+      "WebFetch",
+      "WebSearch",
+      "Bash(find:*)",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(pwd)",
+      "Bash(cd:*)",
+      "Bash(echo:*)",
+      "Bash(mkdir:*)",
+      "Bash(mkdir -p:*)",
+      "Bash(git status)",
+      "Bash(git diff:*)",
+      "Bash(git branch:*)",
+      "Bash(git init:*)",
+      "Bash(git fetch:*)",
+      "Bash(git pull:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git checkout:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(cp:*)",
+      "Bash(test:*)",
+      "Bash(grep:*)",
+      "Bash(sed:*)",
+      "Bash(python3:*)",
+      "Bash(python:*)",
+      "Bash(node:*)",
+      "Bash(npm:*)",
+      "Bash(npx:*)",
+      "Bash(uv:*)",
+      "Bash(uvicorn:*)",
+      "Bash(docker ps:*)",
+      "Bash(docker start:*)",
+      "Bash(docker stop:*)",
+      "Bash(docker logs:*)",
+      "Bash(docker compose up:*)",
+      "Bash(docker compose down:*)",
+      "Bash(docker compose:*)"
+    ],
+    "ask": [
+      "Bash(rm:*)",
+      "Bash(git push:*)"
+    ],
+    "deny": [
+      "Bash(sudo:*)",
+      "Bash(chmod 777:*)"
+    ]
+  },
+
+  "statusLine": {
+    "type": "command",
+    "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/statusline.sh"
+  },
+
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/read-references-reminder.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

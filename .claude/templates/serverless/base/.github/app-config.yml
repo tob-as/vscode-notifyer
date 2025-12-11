@@ -1,0 +1,7 @@
+# App Security Configuration
+# See docs/SECURITY.md for details
+
+# visibility: internal | public
+# - internal: Requires Cloudflare Access protection (default)
+# - public: No Access protection required
+visibility: internal
