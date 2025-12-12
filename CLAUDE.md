@@ -5,14 +5,18 @@
 
 # Project-Specific
 
-> Meta-repository for organization-wide Claude adoption. Contains shared configurations, skills, agents, and standards that enable both developers (coding assistance) and non-developers (app building without code).
+> Meta-repository for KI-assisted development of **Serverless applications on Cloudflare**. Contains shared configurations, skills, agents, and standards optimized for Cloudflare Workers, D1, R2, KV, and Zero Trust.
 
 ### Tech Stack
 
+- **Cloudflare Workers** - Edge serverless compute
+- **Cloudflare D1** - SQLite database at the edge
+- **Cloudflare KV** - Key-value storage
+- **Cloudflare R2** - S3-compatible object storage
+- **Cloudflare Access** - Zero Trust security
 - **Claude Code** - Primary AI coding assistant
-- **Docker** - Containerized dev environments (VS Code Server + Claude CLI)
+- **Docker** - Containerized dev environments
 - **Git** - Version control, branch-based workflows
-- **Railway** - Deployment platform for Claude-built apps (under consideration)
 
 ### Project Structure
 
@@ -22,7 +26,7 @@
   /agents/             - Specialized agent configurations
   /skills/             - Reusable coding patterns and templates
   /settings/           - Hooks, automation rules, settings.json templates
-  /profiles/           - User configurations (developer vs. non-developer)
+  /profiles/           - Cloudflare-focused profiles (end-user, serverless, redwood, microtool)
   /instructions/       - Shared instruction sets
 /docs/                 - Guides, onboarding, reference material
 ```
@@ -59,7 +63,7 @@ Users can import from `.claude/` into their own `~/.claude/` directory.
 - Build v0.1 first, improve after validation
 - "Good enough to be useful" over perfect
 - Basic coding standards yield 3x improvements—don't over-engineer
-- Serve two audiences: developers AND non-developers
+- All apps deploy to Cloudflare (Workers, Pages, D1, R2, KV)
 
 **Implementation process:**
 1. Present implementation plan first
@@ -141,7 +145,7 @@ Persistent todos for this project. Add items here during sessions; review and cl
 
 ---
 
-*Last updated: 07.12.2025*
-*Phase: Setup / v0.1 Development*
+*Last updated: 12.12.2025*
+*Phase: Cloudflare Focus / v0.2*
 # Project Overrides
 

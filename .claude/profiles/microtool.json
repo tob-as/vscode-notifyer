@@ -1,0 +1,16 @@
+{
+  "instructions": [
+    "workflow.md",
+    "hono-api.md",
+    "code-quality.md",
+    "git-workflow.md",
+    "conflict-handling.md"
+  ],
+  "commands": ["design.md", "build.md"],
+  "skills": [
+    "hono-patterns",
+    "shared/react-patterns",
+    "shared/tailwind-patterns",
+    "git/branching.md"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "instructions": [
+    "workflow.md",
+    "redwoodsdk.md",
+    "code-quality.md",
+    "git-workflow.md",
+    "conflict-handling.md"
+  ],
+  "commands": ["design.md", "build.md"],
+  "skills": [
+    "redwoodsdk-patterns",
+    "shared/react-patterns",
+    "shared/tailwind-patterns",
+    "git/branching.md"
+  ]
+}
