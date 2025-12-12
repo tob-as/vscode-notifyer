@@ -2,9 +2,8 @@
 # setup-claude.sh - Initialize or switch TOB Claude config in any project
 # Usage: setup-claude.sh [profile] [options]
 #
-# Profiles:
+# Profiles (Cloudflare-focused):
 #   end-user   - For non-developers building apps (default)
-#   developer  - For developers
 #   serverless - For Cloudflare Workers projects
 #
 # Serverless options:
