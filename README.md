@@ -1,6 +1,6 @@
 # TOB Claude Setup
 
-Shared Claude Code configurations for TOB projects. Run the setup script once to get standardized instructions, commands, and hooks in any project.
+Meta-repository for KI-assisted development of **Serverless applications on Cloudflare**. Run the setup script once to get standardized instructions, commands, and hooks optimized for Cloudflare Workers, D1, R2, KV, and Zero Trust.
 
 ## Quick Start
 
@@ -30,18 +30,46 @@ This creates:
 - `CLAUDE.md` with shared instruction imports
 - `.claude/` folder with symlinked commands, settings, hooks
 
-## Profiles
+## Profiles (Cloudflare-focused)
 
-| Profile | Use Case | Description |
-|---------|----------|-------------|
-| `end-user` | Non-developers | Simplified workflow for building apps (default) |
-| `developer` | Developers | Full coding standards, git workflow |
-| `serverless` | Cloudflare Workers | Edge serverless with security, multi-env |
+| Profile | Use Case | Tech Stack | Description |
+|---------|----------|------------|-------------|
+| `end-user` | Non-developers | Flexible | Simplified workflow for building apps (default) |
+| `serverless` | Pure Workers/API | Workers + KV/D1 | Edge serverless with security, multi-env |
+| `redwood` | Fullstack with SSR | RedwoodSDK + React | React Server Components on Cloudflare |
+| `microtool` | API + React SPA | Hono + React | Monorepo with separate frontend/backend |
+
+### Profile Decision Tree
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    What are you building?                    │
+└─────────────────────────────────────────────────────────────┘
+                              │
+          ┌───────────────────┼───────────────────┐
+          │                   │                   │
+          ▼                   ▼                   ▼
+   No code / just        Pure API /         App with UI?
+   KI assistance?        Worker only?
+          │                   │                   │
+          ▼                   ▼                   │
+      end-user           serverless              │
+                                                 │
+                              ┌──────────────────┴──────────────────┐
+                              │                                     │
+                              ▼                                     ▼
+                     Need SSR / SEO?                    SPA + API separate?
+                     Server Components?
+                              │                                     │
+                              ▼                                     ▼
+                          redwood                              microtool
+```
 
 ```bash
-setup-claude.sh end-user    # Default
-setup-claude.sh developer   # For developers
-setup-claude.sh serverless  # For Cloudflare Workers
+setup-claude.sh end-user    # Default - non-technical users
+setup-claude.sh serverless  # Pure Workers API
+setup-claude.sh redwood     # Fullstack with SSR (RedwoodSDK)
+setup-claude.sh microtool   # React SPA + Hono API (Monorepo)
 ```
 
 ---

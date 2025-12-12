@@ -2,10 +2,11 @@
 # setup-claude.sh - Initialize or switch TOB Claude config in any project
 # Usage: setup-claude.sh [profile] [options]
 #
-# Profiles:
+# Profiles (Cloudflare-focused):
 #   end-user   - For non-developers building apps (default)
-#   developer  - For developers
-#   serverless - For Cloudflare Workers projects
+#   serverless - For Cloudflare Workers (pure API/Worker)
+#   redwood    - For RedwoodSDK fullstack apps (SSR, RSC)
+#   microtool  - For React + Hono microtools (monorepo)
 #
 # Serverless options:
 #   --type=ui|api     Worker type (default: ui)
@@ -17,6 +18,8 @@
 #   setup-claude.sh serverless
 #   setup-claude.sh serverless --type=api
 #   setup-claude.sh serverless --with-d1 --with-auth
+#   setup-claude.sh redwood
+#   setup-claude.sh microtool
 
 set -e
 
