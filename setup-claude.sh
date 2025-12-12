@@ -2,26 +2,24 @@
 # setup-claude.sh - Initialize or switch TOB Claude config in any project
 # Usage: setup-claude.sh [profile] [options]
 #
-# Profiles:
+# Profiles (Cloudflare-focused):
 #   end-user   - For non-developers building apps (default)
-#   developer  - For developers
-#   serverless - For Cloudflare Workers (simple workers)
+#   serverless - For Cloudflare Workers (pure API/Worker)
 #   redwood    - For RedwoodSDK fullstack apps (SSR, RSC)
 #   microtool  - For React + Hono microtools (monorepo)
 #
-# Options (serverless, redwood, microtool):
-#   --type=ui|api     Worker type (default: ui, serverless only)
+# Serverless options:
+#   --type=ui|api     Worker type (default: ui)
 #   --with-kv         Add KV storage
 #   --with-d1         Add D1 database
 #   --with-auth       Add user authentication (workers-users)
-#   --with-pwa        Add PWA support (vite-plugin-pwa)
 #
 # Examples:
 #   setup-claude.sh serverless
 #   setup-claude.sh serverless --type=api
 #   setup-claude.sh serverless --with-d1 --with-auth
-#   setup-claude.sh redwood --with-pwa
-#   setup-claude.sh microtool --with-d1
+#   setup-claude.sh redwood
+#   setup-claude.sh microtool
 
 set -e
 
@@ -34,7 +32,6 @@ WORKER_TYPE="ui"
 WITH_KV=false
 WITH_D1=false
 WITH_AUTH=false
-WITH_PWA=false
 
 for arg in "$@"; do
   case $arg in
@@ -51,9 +48,6 @@ for arg in "$@"; do
       WITH_AUTH=true
       WITH_KV=true  # Auth requires KV for sessions
       WITH_D1=true  # Auth requires D1 for users
-      ;;
-    --with-pwa)
-      WITH_PWA=true
       ;;
     -*)
       echo "Unknown option: $arg"
@@ -340,180 +334,6 @@ if [ "$PROFILE" = "serverless" ]; then
   echo "     - CLOUDFLARE_ACCESS_TOKEN"
   echo "     - CLOUDFLARE_ACCOUNT_ID"
   echo "  3. Run: wrangler dev"
-  echo ""
-fi
-
-# ============================================================
-# REDWOOD PROFILE: Copy templates and setup project
-# ============================================================
-if [ "$PROFILE" = "redwood" ]; then
-  TEMPLATE_DIR="$SCRIPT_DIR/.claude/templates/redwood"
-  PROJECT_NAME=$(basename "$PWD")
-  WORKER_NAME=$(echo "$PROJECT_NAME" | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
-  APP_NAME="$PROJECT_NAME"
-
-  echo ""
-  echo "Setting up RedwoodSDK project..."
-  echo "  App name: $APP_NAME"
-
-  # Copy base templates (only if files don't exist)
-  copy_if_missing() {
-    local src="$1"
-    local dest="$2"
-    if [ ! -e "$dest" ]; then
-      mkdir -p "$(dirname "$dest")"
-      cp "$src" "$dest"
-      echo "  ✓ Created: $dest"
-    fi
-  }
-
-  # Copy base templates
-  if [ -d "$TEMPLATE_DIR/base" ]; then
-    copy_if_missing "$TEMPLATE_DIR/base/package.json" "package.json"
-    copy_if_missing "$TEMPLATE_DIR/base/vite.config.ts" "vite.config.ts"
-    copy_if_missing "$TEMPLATE_DIR/base/wrangler.jsonc" "wrangler.jsonc"
-    copy_if_missing "$TEMPLATE_DIR/base/tsconfig.json" "tsconfig.json"
-
-    # Source files
-    copy_if_missing "$TEMPLATE_DIR/base/src/worker.tsx" "src/worker.tsx"
-    copy_if_missing "$TEMPLATE_DIR/base/src/app/Document.tsx" "src/app/Document.tsx"
-    copy_if_missing "$TEMPLATE_DIR/base/src/app/routes/Home.tsx" "src/app/routes/Home.tsx"
-    copy_if_missing "$TEMPLATE_DIR/base/public/styles.css" "public/styles.css"
-
-    # Workflows
-    copy_if_missing "$TEMPLATE_DIR/base/.github/workflows/deploy-redwood.yml" ".github/workflows/deploy-redwood.yml"
-    copy_if_missing "$TEMPLATE_DIR/base/.github/app-config.yml" ".github/app-config.yml"
-
-    # Terraform
-    copy_if_missing "$TEMPLATE_DIR/base/infra/cloudflare-access/main.tf" "infra/cloudflare-access/main.tf"
-    copy_if_missing "$TEMPLATE_DIR/base/infra/cloudflare-access/variables.tf" "infra/cloudflare-access/variables.tf"
-  fi
-
-  # Replace placeholders
-  replace_placeholders() {
-    local file="$1"
-    if [ -f "$file" ]; then
-      if [[ "$OSTYPE" == "darwin"* ]]; then
-        sed -i '' "s/{{WORKER_NAME}}/$WORKER_NAME/g" "$file" 2>/dev/null || true
-        sed -i '' "s/{{APP_NAME}}/$APP_NAME/g" "$file" 2>/dev/null || true
-      else
-        sed -i "s/{{WORKER_NAME}}/$WORKER_NAME/g" "$file" 2>/dev/null || true
-        sed -i "s/{{APP_NAME}}/$APP_NAME/g" "$file" 2>/dev/null || true
-      fi
-    fi
-  }
-
-  for file in package.json wrangler.jsonc src/worker.tsx src/app/Document.tsx src/app/routes/Home.tsx public/styles.css .github/workflows/*.yml infra/cloudflare-access/*.tf; do
-    replace_placeholders "$file"
-  done
-
-  # PWA add-on info
-  if [ "$WITH_PWA" = true ]; then
-    echo "  📦 PWA: Copy templates/shared/with-pwa/ to add PWA support"
-  fi
-
-  echo ""
-  echo "Next steps:"
-  echo "  1. npm install"
-  echo "  2. npm run dev"
-  echo "  3. Configure wrangler.jsonc with your D1/KV IDs"
-  echo ""
-fi
-
-# ============================================================
-# MICROTOOL PROFILE: Copy templates and setup project
-# ============================================================
-if [ "$PROFILE" = "microtool" ]; then
-  TEMPLATE_DIR="$SCRIPT_DIR/.claude/templates/microtool"
-  PROJECT_NAME=$(basename "$PWD")
-  WORKER_NAME=$(echo "$PROJECT_NAME" | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
-  APP_NAME="$PROJECT_NAME"
-
-  echo ""
-  echo "Setting up Microtool project (React + Hono)..."
-  echo "  App name: $APP_NAME"
-
-  # Copy base templates (only if files don't exist)
-  copy_if_missing() {
-    local src="$1"
-    local dest="$2"
-    if [ ! -e "$dest" ]; then
-      mkdir -p "$(dirname "$dest")"
-      cp "$src" "$dest"
-      echo "  ✓ Created: $dest"
-    fi
-  }
-
-  # Copy all base templates recursively
-  if [ -d "$TEMPLATE_DIR/base" ]; then
-    # Root files
-    copy_if_missing "$TEMPLATE_DIR/base/package.json" "package.json"
-    copy_if_missing "$TEMPLATE_DIR/base/pnpm-workspace.yaml" "pnpm-workspace.yaml"
-    copy_if_missing "$TEMPLATE_DIR/base/turbo.json" "turbo.json"
-
-    # Web app
-    copy_if_missing "$TEMPLATE_DIR/base/apps/web/package.json" "apps/web/package.json"
-    copy_if_missing "$TEMPLATE_DIR/base/apps/web/vite.config.ts" "apps/web/vite.config.ts"
-    copy_if_missing "$TEMPLATE_DIR/base/apps/web/tsconfig.json" "apps/web/tsconfig.json"
-    copy_if_missing "$TEMPLATE_DIR/base/apps/web/index.html" "apps/web/index.html"
-    copy_if_missing "$TEMPLATE_DIR/base/apps/web/src/main.tsx" "apps/web/src/main.tsx"
-    copy_if_missing "$TEMPLATE_DIR/base/apps/web/src/App.tsx" "apps/web/src/App.tsx"
-    copy_if_missing "$TEMPLATE_DIR/base/apps/web/src/styles.css" "apps/web/src/styles.css"
-
-    # API app
-    copy_if_missing "$TEMPLATE_DIR/base/apps/api/package.json" "apps/api/package.json"
-    copy_if_missing "$TEMPLATE_DIR/base/apps/api/wrangler.toml" "apps/api/wrangler.toml"
-    copy_if_missing "$TEMPLATE_DIR/base/apps/api/tsconfig.json" "apps/api/tsconfig.json"
-    copy_if_missing "$TEMPLATE_DIR/base/apps/api/src/index.ts" "apps/api/src/index.ts"
-    copy_if_missing "$TEMPLATE_DIR/base/apps/api/src/routes/health.ts" "apps/api/src/routes/health.ts"
-    copy_if_missing "$TEMPLATE_DIR/base/apps/api/src/routes/items.ts" "apps/api/src/routes/items.ts"
-
-    # Shared package
-    copy_if_missing "$TEMPLATE_DIR/base/packages/shared/package.json" "packages/shared/package.json"
-    copy_if_missing "$TEMPLATE_DIR/base/packages/shared/tsconfig.json" "packages/shared/tsconfig.json"
-    copy_if_missing "$TEMPLATE_DIR/base/packages/shared/src/index.ts" "packages/shared/src/index.ts"
-
-    # Workflows
-    copy_if_missing "$TEMPLATE_DIR/base/.github/workflows/deploy-microtool.yml" ".github/workflows/deploy-microtool.yml"
-    copy_if_missing "$TEMPLATE_DIR/base/.github/app-config.yml" ".github/app-config.yml"
-
-    # Terraform
-    copy_if_missing "$TEMPLATE_DIR/base/infra/cloudflare-access/main.tf" "infra/cloudflare-access/main.tf"
-    copy_if_missing "$TEMPLATE_DIR/base/infra/cloudflare-access/variables.tf" "infra/cloudflare-access/variables.tf"
-  fi
-
-  # Replace placeholders
-  replace_placeholders() {
-    local file="$1"
-    if [ -f "$file" ]; then
-      if [[ "$OSTYPE" == "darwin"* ]]; then
-        sed -i '' "s/{{WORKER_NAME}}/$WORKER_NAME/g" "$file" 2>/dev/null || true
-        sed -i '' "s/{{APP_NAME}}/$APP_NAME/g" "$file" 2>/dev/null || true
-      else
-        sed -i "s/{{WORKER_NAME}}/$WORKER_NAME/g" "$file" 2>/dev/null || true
-        sed -i "s/{{APP_NAME}}/$APP_NAME/g" "$file" 2>/dev/null || true
-      fi
-    fi
-  }
-
-  # Replace in all files
-  for file in package.json apps/web/package.json apps/web/index.html apps/web/src/App.tsx apps/web/src/styles.css apps/api/package.json apps/api/wrangler.toml packages/shared/package.json .github/workflows/*.yml infra/cloudflare-access/*.tf; do
-    replace_placeholders "$file"
-  done
-
-  # Add-ons info
-  if [ "$WITH_D1" = true ]; then
-    echo "  📦 D1: Add database ID to apps/api/wrangler.toml"
-  fi
-  if [ "$WITH_PWA" = true ]; then
-    echo "  📦 PWA: Copy templates/shared/with-pwa/ to apps/web/"
-  fi
-
-  echo ""
-  echo "Next steps:"
-  echo "  1. pnpm install"
-  echo "  2. pnpm dev"
-  echo "  3. Configure apps/api/wrangler.toml with your D1/KV IDs"
   echo ""
 fi
 

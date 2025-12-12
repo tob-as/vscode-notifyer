@@ -1,6 +1,6 @@
 # TOB Claude Setup
 
-Shared Claude Code configurations for TOB projects. Run the setup script once to get standardized instructions, commands, and hooks in any project.
+Meta-repository for KI-assisted development of **Serverless applications on Cloudflare**. Run the setup script once to get standardized instructions, commands, and hooks optimized for Cloudflare Workers, D1, R2, KV, and Zero Trust.
 
 ## Quick Start
 
@@ -30,22 +30,46 @@ This creates:
 - `CLAUDE.md` with shared instruction imports
 - `.claude/` folder with symlinked commands, settings, hooks
 
-## Profiles
+## Profiles (Cloudflare-focused)
 
-| Profile | Use Case | Description |
-|---------|----------|-------------|
-| `end-user` | Non-developers | Simplified workflow for building apps (default) |
-| `developer` | Developers | Full coding standards, git workflow |
-| `serverless` | Simple Workers | Single-file Cloudflare Workers |
-| `redwood` | Fullstack Apps | RedwoodSDK with SSR, React Server Components |
-| `microtool` | Internal Tools | React SPA + Hono API monorepo |
+| Profile | Use Case | Tech Stack | Description |
+|---------|----------|------------|-------------|
+| `end-user` | Non-developers | Flexible | Simplified workflow for building apps (default) |
+| `serverless` | Pure Workers/API | Workers + KV/D1 | Edge serverless with security, multi-env |
+| `redwood` | Fullstack with SSR | RedwoodSDK + React | React Server Components on Cloudflare |
+| `microtool` | API + React SPA | Hono + React | Monorepo with separate frontend/backend |
+
+### Profile Decision Tree
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    What are you building?                    │
+└─────────────────────────────────────────────────────────────┘
+                              │
+          ┌───────────────────┼───────────────────┐
+          │                   │                   │
+          ▼                   ▼                   ▼
+   No code / just        Pure API /         App with UI?
+   KI assistance?        Worker only?
+          │                   │                   │
+          ▼                   ▼                   │
+      end-user           serverless              │
+                                                 │
+                              ┌──────────────────┴──────────────────┐
+                              │                                     │
+                              ▼                                     ▼
+                     Need SSR / SEO?                    SPA + API separate?
+                     Server Components?
+                              │                                     │
+                              ▼                                     ▼
+                          redwood                              microtool
+```
 
 ```bash
-setup-claude.sh end-user    # Default
-setup-claude.sh developer   # For developers
-setup-claude.sh serverless  # Simple Cloudflare Workers
-setup-claude.sh redwood     # RedwoodSDK fullstack apps
-setup-claude.sh microtool   # React + Hono microtools
+setup-claude.sh end-user    # Default - non-technical users
+setup-claude.sh serverless  # Pure Workers API
+setup-claude.sh redwood     # Fullstack with SSR (RedwoodSDK)
+setup-claude.sh microtool   # React SPA + Hono API (Monorepo)
 ```
 
 ---
@@ -147,124 +171,6 @@ setup-claude.sh serverless --with-auth
 ```
 
 See `.claude/templates/serverless/with-auth/README.md` for setup instructions.
-
----
-
-## RedwoodSDK Profile (Fullstack Apps)
-
-The redwood profile sets up a RedwoodSDK fullstack application:
-
-- React + Vite + Cloudflare Workers
-- Server-Side Rendering (SSR)
-- React Server Components
-- Server Functions
-- Multi-environment deployment
-
-### Setup
-
-```bash
-cd my-new-app
-setup-claude.sh redwood
-```
-
-### With Options
-
-```bash
-setup-claude.sh redwood --with-pwa     # Add PWA support
-setup-claude.sh redwood --with-auth    # Add authentication
-```
-
-### What Gets Created
-
-```
-project/
-├── src/
-│   ├── worker.tsx           # Entry point
-│   └── app/
-│       ├── Document.tsx     # HTML layout
-│       └── routes/
-│           └── Home.tsx
-├── package.json
-├── vite.config.ts
-├── wrangler.jsonc           # Multi-environment config
-├── .github/workflows/
-└── infra/cloudflare-access/
-```
-
----
-
-## Microtool Profile (React + Hono)
-
-The microtool profile sets up a monorepo for internal tools:
-
-- React SPA frontend (Cloudflare Pages)
-- Hono API backend (Cloudflare Workers)
-- Turborepo for builds
-- pnpm workspaces
-
-### Setup
-
-```bash
-cd my-new-tool
-setup-claude.sh microtool
-```
-
-### With Options
-
-```bash
-setup-claude.sh microtool --with-d1    # Add D1 database
-setup-claude.sh microtool --with-pwa   # Add PWA support
-```
-
-### What Gets Created
-
-```
-project/
-├── apps/
-│   ├── web/                 # React SPA
-│   │   ├── src/
-│   │   └── package.json
-│   └── api/                 # Hono API
-│       ├── src/
-│       ├── wrangler.toml
-│       └── package.json
-├── packages/
-│   └── shared/              # Shared types
-├── package.json
-├── pnpm-workspace.yaml
-├── turbo.json
-├── .github/workflows/
-└── infra/cloudflare-access/
-```
-
----
-
-## Shared Add-ons
-
-### PWA Support (`--with-pwa`)
-
-Adds Progressive Web App features:
-- Service Worker with Workbox
-- Offline caching
-- App manifest
-
-See `templates/shared/with-pwa/README.md`.
-
-### UI Components
-
-Copy-paste ready React components with Tailwind CSS:
-- Layout: AppShell, Header, Container
-- Forms: Button, Input, Select
-- Data: Card
-- Feedback: Toast, Loading
-
-See `templates/shared/ui/README.md`.
-
-### Foundry Integration
-
-Per-app Foundry integration pattern (no central gateway):
-
-See `.claude/instructions/foundry-integration.md`.
 
 ---
 

@@ -1,14 +1,14 @@
 ---
 name: ui-setup
-description: Create shadcn/ui base components. Use for setting up UI component library.
+description: Create shadcn/ui base components for RedwoodSDK and Microtool projects on Cloudflare.
 tools: Read, Write, Edit
-skills: tailwind-patterns
+skills: shared/react-patterns, shared/tailwind-patterns
 model: sonnet
 ---
 
 # UI Setup Agent
 
-Create shadcn/ui base components.
+Create shadcn/ui base components for Cloudflare-based React projects (RedwoodSDK, Microtool).
 
 ## File Ownership
 
