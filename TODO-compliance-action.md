@@ -2,7 +2,7 @@
 
 ## Konzept
 
-Eine GitHub Action die bei jedem Push prüft, ob das Projekt den tob-claude-setup Standards entspricht.
+Eine GitHub Action die bei jedem Push prüft, ob das Projekt den tob-claude-internal Standards entspricht.
 
 **Trennung der Verantwortlichkeiten:**
 - `setup-claude.sh` (lokal) → Setup (Symlinks, Templates kopieren)

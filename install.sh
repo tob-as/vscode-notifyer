@@ -1,5 +1,5 @@
 #!/bin/bash
-# install.sh - Run once after cloning tob-claude-setup
+# install.sh - Run once after cloning tob-claude-internal
 # Installs dependencies and adds paths to shell config
 
 set -e
@@ -119,14 +119,14 @@ else
   echo "✓ ~/.local/bin already in PATH"
 fi
 
-# Add tob-claude-setup to PATH
-if ! grep -q "tob-claude-setup" "$SHELL_RC" 2>/dev/null; then
+# Add tob-claude-internal to PATH
+if ! grep -q "tob-claude-internal" "$SHELL_RC" 2>/dev/null; then
   echo "" >> "$SHELL_RC"
-  echo "# TOB Claude Setup" >> "$SHELL_RC"
+  echo "# TOB Claude Internal" >> "$SHELL_RC"
   echo "export PATH=\"\$PATH:$SCRIPT_DIR\"" >> "$SHELL_RC"
-  echo "✓ Added tob-claude-setup to PATH"
+  echo "✓ Added tob-claude-internal to PATH"
 else
-  echo "✓ tob-claude-setup already in PATH"
+  echo "✓ tob-claude-internal already in PATH"
 fi
 
 echo ""

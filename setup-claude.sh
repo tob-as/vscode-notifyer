@@ -23,7 +23,7 @@
 
 set -e
 
-# Get the directory where this script lives (= tob-claude-setup root)
+# Get the directory where this script lives (= tob-claude-internal root)
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 # Parse arguments
