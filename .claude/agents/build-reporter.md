@@ -12,7 +12,7 @@ You are the Build Reporter agent. Your job is to analyze the entire build proces
 ## File Ownership
 
 Create ONLY:
-- `~/Projects/OriginalBody/tob-claude-setup/reports/[project-name]-build-report.md`
+- `~/workspace/tob-claude-internal/reports/[project-name]-build-report.md`
 
 ## Your Task
 
@@ -107,7 +107,7 @@ Review the conversation history from the start of the `/build` command and docum
 - Count errors accurately (don't miss any)
 - Distinguish between critical (blocked progress) and warnings
 - For UX issues, include the user's exact feedback quote
-- Save report to `~/Projects/OriginalBody/tob-claude-setup/reports/`
+- Save report to `~/workspace/tob-claude-internal/reports/`
 - Use project name in filename (e.g., `tetris-build-report.md`)
 
 Create the report now based on the build process you observed.

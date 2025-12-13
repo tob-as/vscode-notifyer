@@ -1,4 +1,4 @@
-# TOB Claude Setup
+# TOB Claude Internal
 
 Meta-repository for KI-assisted development of **Serverless applications on Cloudflare**. Run the setup script once to get standardized instructions, commands, and hooks optimized for Cloudflare Workers, D1, R2, KV, and Zero Trust.
 
@@ -7,14 +7,14 @@ Meta-repository for KI-assisted development of **Serverless applications on Clou
 ### 1. Clone this repo (once)
 
 ```bash
-cd ~/Projects/OriginalBody  # or wherever you keep TOB repos
-git clone git@github.com:OriginalBody/tob-claude-setup.git
+cd ~/workspace  # or wherever you keep TOB repos
+git clone git@github.com:OriginalBody/tob-claude-internal.git
 ```
 
 ### 2. Install (once)
 
 ```bash
-cd tob-claude-setup
+cd tob-claude-internal
 ./install.sh
 source ~/.zshrc  # or open new terminal
 ```
@@ -191,7 +191,7 @@ See `.claude/templates/serverless/with-auth/README.md` for setup instructions.
 Pull latest and re-run setup in your projects:
 
 ```bash
-cd ~/Projects/OriginalBody/tob-claude-setup
+cd ~/workspace/tob-claude-internal
 git pull
 ```
 

@@ -1,19 +1,19 @@
 # Switch Profile
 
-Switch the tob-claude-setup profile for this project.
+Switch the tob-claude-internal profile for this project.
 
 ## Usage
-Run this command with a profile name: `/switch-profile developer` or `/switch-profile end-user`
+Run this command with a profile name: `/switch-profile serverless` or `/switch-profile end-user`
 
 ## Instructions
 
-1. If no profile name was provided (no arguments), list available profiles by reading the filenames in `~/Projects/OriginalBody/tob-claude-setup/.claude/profiles/` and respond with "Usage: `/switch-profile <profile-name>`. Available profiles: developer, end-user" — then stop.
+1. If no profile name was provided (no arguments), list available profiles by reading the filenames in `~/workspace/tob-claude-internal/.claude/profiles/` and respond with "Usage: `/switch-profile <profile-name>`. Available profiles: serverless, redwood, microtool, end-user" — then stop.
 
 2. Check the current profile by reading `.claude/active-profile`. If the requested profile matches the current profile, respond with "You are already using the '[profile]' profile." and stop — do not execute any further steps.
 
 3. Run the setup script with the requested profile:
    ```bash
-   ~/Projects/OriginalBody/tob-claude-setup/setup-claude.sh $ARGUMENTS
+   ~/workspace/tob-claude-internal/setup-claude.sh $ARGUMENTS
    ```
 
 4. Read the updated CLAUDE.md to see the new `@` references.

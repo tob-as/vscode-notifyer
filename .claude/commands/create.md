@@ -11,7 +11,7 @@ Create a new project with TOB Claude setup.
 ## Arguments
 
 - **project-name** (required): Name for the project folder
-- **profile** (optional): `developer` | `end-user` (default: `developer`)
+- **profile** (optional): `serverless` | `redwood` | `microtool` | `end-user` (default: `serverless`)
 
 ## Execution Steps
 
@@ -19,10 +19,12 @@ Create a new project with TOB Claude setup.
 
 Extract from user input:
 1. `project-name` - the first argument after `/create`
-2. `profile` - the second argument (optional, default: `developer`)
+2. `profile` - the second argument (optional, default: `serverless`)
 
 Example inputs:
-- `/create my-app` → name: `my-app`, profile: `developer`
+- `/create my-app` → name: `my-app`, profile: `serverless`
+- `/create my-app redwood` → name: `my-app`, profile: `redwood`
+- `/create my-app microtool` → name: `my-app`, profile: `microtool`
 - `/create my-app end-user` → name: `my-app`, profile: `end-user`
 
 ### Step 2: Validate Input
@@ -65,7 +67,7 @@ cd /home/coder/workspace/repos/<project-name> && git init
 ### Step 5: Run Setup Script
 
 ```bash
-cd /home/coder/workspace/repos/<project-name> && /home/coder/workspace/tob-claude-setup/setup-claude.sh <profile>
+cd /home/coder/workspace/repos/<project-name> && /home/coder/workspace/tob-claude-internal/setup-claude.sh <profile>
 ```
 
 If setup fails, show the error and suggest:
@@ -98,12 +100,23 @@ code /home/coder/workspace/repos/<project-name>
 | Invalid characters | "Invalid project name. Use only letters, numbers, hyphens, underscores." |
 | Folder exists | "Project '<name>' already exists. Choose a different name." |
 | Setup fails | Show error output from setup-claude.sh |
-| Invalid profile | "Unknown profile '<profile>'. Available: developer, end-user" |
+| Invalid profile | "Unknown profile '<profile>'. Available: serverless, redwood, microtool, end-user" |
+
+## Available Profiles
+
+| Profile | Description |
+|---------|-------------|
+| `serverless` | Pure Cloudflare Workers (API, KV, D1) - **default** |
+| `redwood` | Fullstack with RedwoodSDK (React Server Components, SSR) |
+| `microtool` | React SPA + Hono API (monorepo architecture) |
+| `end-user` | Simplified workflow for non-developers |
 
 ## Examples
 
 ```
 /create vetbot-app
-/create okr-dashboard developer
+/create okr-dashboard redwood
 /create simple-landing end-user
+/create api-service serverless
+/create fullstack-app microtool
 ```

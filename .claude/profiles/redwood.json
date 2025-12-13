@@ -6,7 +6,7 @@
     "git-workflow.md",
     "conflict-handling.md"
   ],
-  "commands": ["design.md", "build.md"],
+  "commands": ["design.md", "build.md", "create.md"],
   "skills": [
     "redwoodsdk-patterns",
     "shared/react-patterns",
