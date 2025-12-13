@@ -189,3 +189,13 @@ copy_if_missing "$SCRIPT_DIR/.claude/templates/shared/ci/claude-compliance.yml" 
 ## Priorität
 
 **Medium** - Kann nach den Basis-Features implementiert werden. Nützlich für Team-Compliance sobald mehrere Projekte existieren.
+
+---
+
+## Status
+
+**IMPLEMENTIERT** (Wave 3, 13.12.2025)
+
+- [x] Workflow erstellt: `.claude/templates/shared/ci/claude-compliance.yml`
+- [x] setup-version.yml Generation in `setup-claude.sh`
+- [x] Auto-copy für serverless Profile

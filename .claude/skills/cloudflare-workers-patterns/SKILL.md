@@ -2,6 +2,10 @@
 name: cloudflare-workers-patterns
 description: Cloudflare Workers patterns for serverless development. Covers fetch handlers, routing, KV/D1 storage, environment variables, and security patterns.
 allowed-tools: WebFetch, Read, Grep, Glob
+last_verified: "2025-12-13"
+target_versions:
+  wrangler: "3.x"
+  workers-types: "4.x"
 ---
 
 # Cloudflare Workers Patterns

@@ -2,6 +2,10 @@
 name: redwoodsdk-patterns
 description: RedwoodSDK patterns for building fullstack React apps on Cloudflare Workers. Covers routing, server functions, React Server Components, and data fetching.
 allowed-tools: WebFetch, Read, Grep, Glob
+last_verified: "2025-12-13"
+target_versions:
+  redwoodsdk: "0.x"
+  react: "18.x"
 ---
 
 # RedwoodSDK Patterns

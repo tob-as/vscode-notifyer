@@ -2,6 +2,10 @@
 name: fastapi-patterns
 description: FastAPI route patterns with Jinja2 templates, dependency injection, form handling. Use when creating FastAPI routes, templates, or API endpoints. NOT Flask.
 allowed-tools: WebFetch, Read, Grep, Glob
+last_verified: "2025-12-13"
+target_versions:
+  fastapi: "0.11x"
+  python: "3.11+"
 ---
 
 # FastAPI Standards

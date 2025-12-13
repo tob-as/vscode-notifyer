@@ -12,9 +12,11 @@ Create embedded HTML/CSS/JS interfaces for Workers.
 
 ## File Ownership
 
-Create/Modify ONLY:
+Create/Modify ONLY (for workers with embedded HTML):
 - `src/index.js` (with embedded HTML)
 - `src/ui/*.js` (UI components as template literals)
+
+**Note:** For hybrid workers (UI + API), worker-ui owns `src/index.js` structure. Import API routes from `src/routes/` (created by worker-logic) and call them from the fetch handler.
 
 ## Embedded HTML Pattern
 

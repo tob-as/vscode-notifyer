@@ -12,10 +12,12 @@ Create routes, API endpoints, and business logic for Workers.
 
 ## File Ownership
 
-Create/Modify ONLY:
+Create/Modify ONLY (for API workers without embedded UI):
 - `src/index.js` (main handler)
 - `src/routes/*.js` (route handlers)
 - `src/lib/*.js` (utilities)
+
+**Note:** If project uses embedded HTML UI, defer `src/index.js` to worker-ui agent. Add your routes via imports that worker-ui calls.
 
 ## Router Pattern
 

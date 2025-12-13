@@ -2,6 +2,9 @@
 name: ui-design-patterns
 description: Pico CSS patterns for Python stack apps, semantic HTML, dark mode templates. Use when creating HTML templates, styling with Pico CSS, or building Python web UIs.
 allowed-tools: Read, Grep, Glob
+last_verified: "2025-12-13"
+target_versions:
+  picocss: "2.x"
 ---
 
 # UI Design Standards (Python Stack)

@@ -2,6 +2,10 @@
 name: hono-patterns
 description: Hono patterns for building APIs on Cloudflare Workers. Covers routing, middleware, validation, error handling, and database access.
 allowed-tools: WebFetch, Read, Grep, Glob
+last_verified: "2025-12-13"
+target_versions:
+  hono: "4.x"
+  wrangler: "3.x"
 ---
 
 # Hono API Patterns

@@ -2,6 +2,10 @@
 name: sqlalchemy-patterns
 description: SQLAlchemy ORM models, database setup, relationships, session management. Use when creating database models, setting up SQLAlchemy, or working with SQLite databases.
 allowed-tools: WebFetch, Read, Grep, Glob
+last_verified: "2025-12-13"
+target_versions:
+  sqlalchemy: "2.x"
+  python: "3.11+"
 ---
 
 # SQLAlchemy Standards

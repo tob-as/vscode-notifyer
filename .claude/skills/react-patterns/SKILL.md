@@ -2,6 +2,10 @@
 name: react-patterns
 description: React component patterns, TypeScript interfaces, naming conventions, export/import standards. Use when creating React components, defining props, or organizing component files.
 allowed-tools: WebFetch, Read, Grep, Glob
+last_verified: "2025-12-13"
+target_versions:
+  react: "18.x"
+  typescript: "5.x"
 ---
 
 # React Standards

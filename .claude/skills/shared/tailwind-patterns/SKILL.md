@@ -2,6 +2,10 @@
 name: tailwind-patterns
 description: Tailwind CSS + shadcn/ui component patterns, Dialog/Modal layouts, conditional classes. Use when styling components, creating modals, or working with shadcn/ui.
 allowed-tools: WebFetch, Read, Grep, Glob
+last_verified: "2025-12-13"
+target_versions:
+  tailwindcss: "3.x"
+  shadcn-ui: "latest"
 ---
 
 # Tailwind + shadcn/ui Standards

@@ -2,6 +2,10 @@
 name: prisma-patterns
 description: Prisma ORM schema patterns, client setup, common queries, optimization strategies. Use when creating Prisma schemas, setting up database clients, or writing queries. Can fetch latest Prisma docs.
 allowed-tools: WebFetch, Read, Grep, Glob
+last_verified: "2025-12-13"
+target_versions:
+  prisma: "5.x"
+  prisma-client: "5.x"
 ---
 
 # Prisma Standards

@@ -129,14 +129,71 @@ else
   echo "✓ tob-claude-internal already in PATH"
 fi
 
+# ============================================================
+# Setup Claude Home (User-level ~/.claude)
+# ============================================================
+echo ""
+echo "Setting up Claude Home..."
+
+mkdir -p "$HOME/.claude/commands"
+
+# Create user-level CLAUDE.md with home context
+if [ ! -f "$HOME/.claude/CLAUDE.md" ]; then
+  cat > "$HOME/.claude/CLAUDE.md" << 'HOMEEOF'
+# User-level Claude Configuration
+
+## TOB Claude Home
+@~/workspace/tob-claude-internal/.claude/instructions/home-context.md
+
+## Workspace Structure
+- **Meta-Repo:** ~/workspace/tob-claude-internal (Skills, Agents, Standards)
+- **Projects:** ~/workspace/repos/* (Projekt-Repositories)
+
+## Auto-Scope Detection
+
+When starting a session, determine scope by:
+1. Check if current directory is inside a git repository
+2. If yes: work within that repository's boundaries
+3. If no: ask user which project to work on
+
+## Git Repository Context
+
+To find the current project root:
+```bash
+git rev-parse --show-toplevel 2>/dev/null
+```
+
+If working in a git repo, restrict file operations to that repo unless explicitly requested otherwise.
+HOMEEOF
+  echo "✓ Created ~/.claude/CLAUDE.md"
+else
+  echo "✓ ~/.claude/CLAUDE.md already exists"
+fi
+
+# Symlink global commands (available everywhere)
+GLOBAL_COMMANDS="create.md"
+for cmd in $GLOBAL_COMMANDS; do
+  if [ -f "$SCRIPT_DIR/.claude/commands/$cmd" ]; then
+    ln -sfn "$SCRIPT_DIR/.claude/commands/$cmd" "$HOME/.claude/commands/$cmd"
+    echo "✓ Linked global command: /$cmd"
+  fi
+done
+
 echo ""
 echo "=== Installation Complete ==="
 echo ""
+echo "What was set up:"
+echo "  ✓ Dependencies (uv, node, jq)"
+echo "  ✓ PATH configured"
+echo "  ✓ Claude Home (~/.claude/CLAUDE.md)"
+echo "  ✓ Global commands (/create)"
+echo ""
 echo "Next steps:"
 echo "  1. Run: source $SHELL_RC (or open new terminal)"
-echo "  2. In any project, run: setup-claude.sh"
+echo "  2. Use /create <name> to start a new project"
+echo "  3. Or in existing project: setup-claude.sh"
 echo ""
-echo "For /build command, ensure you have:"
-echo "  - Node.js (for Next.js apps)"
-echo "  - uv (for Python apps) ✓"
-echo "  - jq (for setup-claude.sh)"
+echo "Claude will now automatically:"
+echo "  - Know the TOB meta-repo location"
+echo "  - Detect git repository boundaries"
+echo "  - Have /create available globally"

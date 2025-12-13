@@ -73,9 +73,48 @@ fi
 
 # Check jq is available
 if ! command -v jq &> /dev/null; then
-  echo "Error: jq is required. Install with: brew install jq"
+  echo "Error: jq is required but not installed"
+  echo ""
+  echo "Install with:"
+  echo "  macOS:  brew install jq"
+  echo "  Ubuntu: sudo apt-get install jq"
+  echo "  Alpine: apk add jq"
   exit 1
 fi
+
+# Validate profile templates exist
+validate_profile_templates() {
+  local profile="$1"
+  local missing=""
+
+  # Check for required template directories per profile
+  case "$profile" in
+    serverless)
+      [ ! -d "$SCRIPT_DIR/.claude/templates/serverless/base" ] && missing="$missing serverless/base"
+      ;;
+    redwood)
+      [ ! -d "$SCRIPT_DIR/.claude/templates/redwood/base" ] && missing="$missing redwood/base"
+      ;;
+    microtool)
+      [ ! -d "$SCRIPT_DIR/.claude/templates/microtool/base" ] && missing="$missing microtool/base"
+      ;;
+  esac
+
+  # Check shared templates (warning only)
+  if [ ! -f "$SCRIPT_DIR/.claude/templates/shared/ci/claude-compliance.yml" ]; then
+    echo "Warning: claude-compliance.yml not found - compliance checks will not be copied"
+  fi
+
+  if [ -n "$missing" ]; then
+    echo "Error: Missing template directories:$missing"
+    echo ""
+    echo "Please ensure tob-claude-internal is up to date:"
+    echo "  cd $SCRIPT_DIR && git pull"
+    exit 1
+  fi
+}
+
+validate_profile_templates "$PROFILE"
 
 # Merge general.json with profile-specific settings
 merge_settings() {
@@ -148,8 +187,16 @@ elif ! has_standard_structure; then
 
   # Check if claude CLI is available
   if ! command -v claude &> /dev/null; then
-    echo "Error: 'claude' CLI not found. Cannot refactor CLAUDE.md automatically."
-    echo "Please install Claude Code CLI first."
+    echo "Error: 'claude' CLI not found"
+    echo ""
+    echo "The Claude CLI is required to refactor non-standard CLAUDE.md files."
+    echo "Install from: https://docs.anthropic.com/claude-code"
+    echo ""
+    echo "Alternatively, manually restructure CLAUDE.md with these sections:"
+    echo "  # Team Standards"
+    echo "  @path/to/instructions..."
+    echo "  # Project-Specific"
+    echo "  # Project Overrides"
     exit 1
   fi
 
@@ -240,6 +287,14 @@ done
 # Store active profile
 echo "$PROFILE" > .claude/active-profile
 
+# Create version marker for compliance tracking
+cat > .claude/setup-version.yml << EOF
+version: "1.0.0"
+profile: "$PROFILE"
+setup_date: "$(date +%Y-%m-%d)"
+tob_claude_commit: "$(cd "$SCRIPT_DIR" && git rev-parse --short HEAD 2>/dev/null || echo 'unknown')"
+EOF
+
 # ============================================================
 # SERVERLESS PROFILE: Copy templates and setup project
 # ============================================================
@@ -270,6 +325,7 @@ if [ "$PROFILE" = "serverless" ]; then
     # Workflows
     copy_if_missing "$TEMPLATE_DIR/base/.github/workflows/deploy-cloudflare.yml" ".github/workflows/deploy-cloudflare.yml"
     copy_if_missing "$TEMPLATE_DIR/base/.github/workflows/deploy-cloudflare-access.yml" ".github/workflows/deploy-cloudflare-access.yml"
+    copy_if_missing "$SCRIPT_DIR/.claude/templates/shared/ci/claude-compliance.yml" ".github/workflows/claude-compliance.yml"
     copy_if_missing "$TEMPLATE_DIR/base/.github/app-config.yml" ".github/app-config.yml"
 
     # Terraform

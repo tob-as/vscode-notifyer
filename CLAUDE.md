@@ -140,12 +140,12 @@ For conflicts, use explicit overrides:
 
 Persistent todos for this project. Add items here during sessions; review and clean up regularly.
 
-- [ ] Add version tracking to skills (track "last verified" date or library versions)
-- [ ] Document cross-skill interaction (what happens when agents load multiple skills)
+- [x] Add version tracking to skills (completed Wave 3)
+- [x] Document cross-skill interaction (see docs/cross-skill-interaction.md)
 
 ---
 
-*Last updated: 12.12.2025*
-*Phase: Cloudflare Focus / v0.2*
+*Last updated: 13.12.2025*
+*Phase: Cloudflare Focus / v0.3*
 # Project Overrides
 

@@ -2,6 +2,10 @@
 name: nextjs-patterns
 description: Next.js 14+ App Router patterns, Server/Client component rules, Button+Link patterns, data fetching. Use when creating pages, components, layouts, or routes in Next.js apps. Checks latest docs when needed.
 allowed-tools: WebFetch, Read, Grep, Glob
+last_verified: "2025-12-13"
+target_versions:
+  nextjs: "14.x"
+  react: "18.x"
 ---
 
 # Next.js Standards
