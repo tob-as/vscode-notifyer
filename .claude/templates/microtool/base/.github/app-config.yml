@@ -1,4 +1,0 @@
-# Application Security Configuration
-# Change to 'public' only if this app should be publicly accessible
-
-visibility: internal
