@@ -5,13 +5,13 @@ Create a new project with TOB Claude setup. Uses GitHub repository creation for 
 ## Usage
 
 ```
-/create <project-name> [profile]
+/create <project-name> [--api-only]
 ```
 
 ## Arguments
 
 - **project-name** (required): Name for the project (kebab-case)
-- **profile** (optional): `redwood` | `serverless` | `end-user` (default: `redwood`)
+- **--api-only** (optional): Create API-only serverless project (no UI)
 
 ## Execution Steps
 
@@ -19,12 +19,11 @@ Create a new project with TOB Claude setup. Uses GitHub repository creation for 
 
 Extract from user input:
 1. `project-name` - the first argument after `/create`
-2. `profile` - the second argument (optional, default: `redwood`)
+2. `--api-only` flag - if present, use serverless profile
 
 Example inputs:
-- `/create my-app` → name: `my-app`, profile: `redwood`
-- `/create my-app serverless` → name: `my-app`, profile: `serverless`
-- `/create my-app end-user` → name: `my-app`, profile: `end-user`
+- `/create my-app` → name: `my-app`, profile: `redwood` (default)
+- `/create my-app --api-only` → name: `my-app`, profile: `serverless`
 
 ### Step 2: Validate Input
 
@@ -140,27 +139,26 @@ code /home/coder/workspace/repos/<project-name>
 
 | Error | Message |
 |-------|---------|
-| No project name | "Usage: /create <project-name> [profile]" |
+| No project name | "Usage: /create <project-name> [--api-only]" |
 | Invalid characters | "Invalid project name. Use lowercase letters, numbers, and hyphens only." |
 | Repo exists | "Repository already exists. Choose a different name or delete the existing repo." |
 | gh not authenticated | "Not authenticated with GitHub. Run: gh auth login" |
 | Setup fails | Show error output from setup-claude.sh |
-| Invalid profile | "Unknown profile '<profile>'. Available: redwood, serverless, end-user" |
 
-## Available Profiles
+## Stack Selection (Automatic)
 
-| Profile | Description | When to Use |
-|---------|-------------|-------------|
-| `redwood` | Fullstack with RedwoodSDK (RSC, Prisma, D1) - **default** | Apps with UI |
-| `serverless` | Pure Cloudflare Workers API (TypeScript) | API-only services |
-| `end-user` | Simplified workflow for non-developers | Non-technical users |
+| Usage | Stack | Description |
+|-------|-------|-------------|
+| Default | `redwood` | Fullstack with RedwoodSDK (RSC, Prisma, D1) |
+| `--api-only` | `serverless` | Pure Cloudflare Workers API (TypeScript) |
+
+**Redwood is the ONLY option for apps with UI.** No alternatives.
 
 ## Examples
 
 ```
 /create okr-dashboard              # Redwood fullstack app (default)
-/create api-gateway serverless     # API-only worker
-/create landing-page end-user      # Simple app for non-dev
+/create api-gateway --api-only     # API-only worker (no UI)
 ```
 
 ## What Gets Created

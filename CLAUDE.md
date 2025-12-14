@@ -2,6 +2,7 @@
 @~/workspace/tob-claude-internal/.claude/instructions/workflow.md
 @~/workspace/tob-claude-internal/.claude/instructions/response-style-user.md
 @~/workspace/tob-claude-internal/.claude/instructions/conflict-handling.md
+@~/workspace/tob-claude-internal/.claude/instructions/security-critical.md
 
 # Project-Specific
 
@@ -26,7 +27,7 @@
   /agents/             - Specialized agent configurations
   /skills/             - Reusable coding patterns and templates
   /settings/           - Hooks, automation rules, settings.json templates
-  /profiles/           - Cloudflare-focused profiles (end-user, serverless, redwood)
+  /profiles/           - Cloudflare-focused profiles (serverless, redwood)
   /instructions/       - Shared instruction sets
 /docs/                 - Guides, onboarding, reference material
 ```
@@ -155,10 +156,14 @@ Persistent todos for this project. Add items here during sessions; review and cl
 - [x] TypeScript-only enforcement (Wave 4)
 - [x] /create v2 with GitHub repo creation (Wave 4)
 - [x] /update command for upstream sync (Wave 4)
+- [x] Zero Trust compliance gate (Wave 5)
+- [x] Vitest testing foundation (Wave 5)
+- [x] Single Path - Redwood only for UI (Wave 6)
+- [x] Smart Permissions - security-critical files (Wave 6)
 
 ---
 
 *Last updated: 14.12.2025*
-*Phase: Redwood Standard / v0.4*
+*Phase: Single Path / v0.5*
 # Project Overrides
 
