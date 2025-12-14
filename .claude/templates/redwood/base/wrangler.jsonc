@@ -1,0 +1,59 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "{{WORKER_NAME}}-prod",
+  "main": "src/worker.tsx",
+  "compatibility_date": "2024-12-01",
+  "compatibility_flags": ["nodejs_compat"],
+
+  // Uncomment and configure D1 database
+  // "d1_databases": [
+  //   {
+  //     "binding": "DB",
+  //     "database_name": "{{WORKER_NAME}}-db-prod",
+  //     "database_id": "<your-prod-database-id>"
+  //   }
+  // ],
+
+  // Uncomment and configure KV namespace
+  // "kv_namespaces": [
+  //   {
+  //     "binding": "KV",
+  //     "id": "<your-prod-kv-id>"
+  //   }
+  // ],
+
+  "env": {
+    "dev": {
+      "name": "{{WORKER_NAME}}-dev"
+      // "d1_databases": [
+      //   {
+      //     "binding": "DB",
+      //     "database_name": "{{WORKER_NAME}}-db-dev",
+      //     "database_id": "<your-dev-database-id>"
+      //   }
+      // ],
+      // "kv_namespaces": [
+      //   {
+      //     "binding": "KV",
+      //     "id": "<your-dev-kv-id>"
+      //   }
+      // ]
+    },
+    "staging": {
+      "name": "{{WORKER_NAME}}-staging"
+      // "d1_databases": [
+      //   {
+      //     "binding": "DB",
+      //     "database_name": "{{WORKER_NAME}}-db-staging",
+      //     "database_id": "<your-staging-database-id>"
+      //   }
+      // ],
+      // "kv_namespaces": [
+      //   {
+      //     "binding": "KV",
+      //     "id": "<your-staging-kv-id>"
+      //   }
+      // ]
+    }
+  }
+}

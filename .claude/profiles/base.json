@@ -1,0 +1,9 @@
+{
+  "scope": "serverless",
+  "instructions": [
+    "workflow.md",
+    "code-quality.md",
+    "git-workflow.md",
+    "conflict-handling.md"
+  ]
+}

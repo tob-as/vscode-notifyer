@@ -1,0 +1,83 @@
+name: Feature / Epic
+description: Propose a new feature or epic (PRD-style)
+title: "[Feature]: "
+labels: ["type:feature"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template for new features or epics. For smaller work items, use the Story template.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / Context
+      description: What problem does this feature solve? What's the current situation?
+      placeholder: "Users currently have to... This causes..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: target-audience
+    attributes:
+      label: Target Audience
+      description: Who will benefit from this feature?
+      placeholder: "Internal team members who need to..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: success-criteria
+    attributes:
+      label: Success Criteria / KPIs
+      description: How do we know this feature is successful?
+      placeholder: |
+        - Users can complete X in under Y seconds
+        - Error rate reduced by Z%
+    validations:
+      required: true
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: What's in scope and out of scope?
+      placeholder: |
+        **In Scope:**
+        - ...
+
+        **Out of Scope:**
+        - ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: risks
+    attributes:
+      label: Risks
+      description: Security, migration, or technical risks to consider
+      placeholder: |
+        - Security: ...
+        - Migration: ...
+        - Technical: ...
+    validations:
+      required: false
+
+  - type: dropdown
+    id: visibility
+    attributes:
+      label: Visibility
+      description: Will this be internal-only or public-facing?
+      options:
+        - internal
+        - public
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Any other relevant information, mockups, or references
+    validations:
+      required: false

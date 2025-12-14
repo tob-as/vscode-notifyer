@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(wrangler dev:*)",
+      "Bash(wrangler secret:*)",
+      "Bash(wrangler tail:*)",
+      "Bash(wrangler types:*)",
+      "Bash(wrangler d1:*)",
+      "Bash(wrangler kv:*)",
+      "Bash(wrangler r2:*)",
+      "Bash(terraform:*)",
+      "Bash(npm:*)",
+      "Bash(npx:*)",
+      "Bash(node:*)",
+      "Bash(curl:*)",
+      "Bash(jq:*)"
+    ],
+    "deny": [
+      "Bash(wrangler deploy:*)",
+      "Bash(wrangler publish:*)"
+    ]
+  },
+  "env": {
+    "CLOUDFLARE_API_TOKEN": "",
+    "CLOUDFLARE_ACCOUNT_ID": ""
+  }
+}

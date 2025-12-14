@@ -1,32 +1,13 @@
-# Dependencies
-node_modules/
+# macOS
+.DS_Store
 
-# Build output
-dist/
-out/
-*.vsix
+# Local settings (not committed)
+.claude/settings.local.json
 
-# IDE
-.vscode/*
-!.vscode/extensions.json
-!.vscode/launch.json
-!.vscode/tasks.json
+# Editor
+.vscode/
 .idea/
 
-# OS
-.DS_Store
-Thumbs.db
-
-# Logs
-*.log
-npm-debug.log*
-
-# Test coverage
-coverage/
-
-# Stream Deck
-*.streamDeckPlugin
-
-# Temporary files
-*.tmp
-*.temp
+# Node (for Next.js branch)
+node_modules/
+.next/

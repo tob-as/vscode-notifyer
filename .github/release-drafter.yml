@@ -1,0 +1,66 @@
+name-template: 'v$RESOLVED_VERSION'
+tag-template: 'v$RESOLVED_VERSION'
+
+categories:
+  - title: '🚀 Features'
+    labels:
+      - 'type:feature'
+  - title: '🐛 Bug Fixes'
+    labels:
+      - 'type:bug'
+  - title: '🔒 Security'
+    labels:
+      - 'type:security'
+  - title: '🧹 Maintenance'
+    labels:
+      - 'type:chore'
+      - 'type:docs'
+  - title: '⚙️ Meta'
+    labels:
+      - 'type:meta'
+
+change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
+change-title-escapes: '\<*_&'
+
+version-resolver:
+  major:
+    labels:
+      - 'release:major'
+  minor:
+    labels:
+      - 'release:minor'
+  patch:
+    labels:
+      - 'release:patch'
+  default: patch
+
+exclude-labels:
+  - 'release:skip'
+
+autolabeler:
+  - label: 'type:chore'
+    files:
+      - '*.md'
+      - '.github/**/*'
+    branch:
+      - '/^chore\//'
+  - label: 'type:docs'
+    files:
+      - 'docs/**/*'
+    branch:
+      - '/^docs\//'
+  - label: 'type:feature'
+    branch:
+      - '/^feat\//'
+      - '/^feature\//'
+  - label: 'type:bug'
+    branch:
+      - '/^fix\//'
+      - '/^bugfix\//'
+
+template: |
+  ## What's Changed
+
+  $CHANGES
+
+  **Full Changelog**: https://github.com/$OWNER/$REPOSITORY/compare/$PREVIOUS_TAG...v$RESOLVED_VERSION

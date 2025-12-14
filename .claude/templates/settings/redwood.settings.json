@@ -1,0 +1,40 @@
+{
+  "permissions": {
+    "read": ["**/*"],
+    "write": [
+      "src/**",
+      "app/**",
+      "public/**",
+      "prisma/**",
+      ".claude/**",
+      ".github/**",
+      "infra/**",
+      "docs/**",
+      "scripts/**",
+      "*.config.ts",
+      "*.config.js",
+      "vite.config.ts",
+      "wrangler.jsonc",
+      "wrangler.toml",
+      "package.json",
+      "tsconfig.json",
+      "playwright.config.ts",
+      "vitest.config.ts",
+      "CLAUDE.md",
+      "CLAUDE_SCOPE.md",
+      "README.md"
+    ],
+    "deny": [
+      "Read(.env)",
+      "Read(.dev.vars)",
+      "Read(**/.env)",
+      "Read(**/.dev.vars)",
+      "Read(secrets/**)",
+      "Edit(.env)",
+      "Edit(.dev.vars)",
+      "Write(.env)",
+      "Write(.dev.vars)",
+      "Write(secrets/**)"
+    ]
+  }
+}

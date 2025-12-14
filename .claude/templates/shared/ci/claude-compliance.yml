@@ -1,0 +1,179 @@
+name: Claude Setup Compliance
+
+on:
+  push:
+    branches: [main, develop, staging]
+  pull_request:
+
+jobs:
+  compliance:
+    name: Check Compliance
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # 1. CLAUDE.md CHECKS
+      - name: Check CLAUDE.md exists
+        run: |
+          if [ ! -f "CLAUDE.md" ]; then
+            echo "::error::CLAUDE.md not found"
+            exit 1
+          fi
+          echo "✓ CLAUDE.md exists"
+
+      - name: Verify required @imports
+        run: |
+          MISSING=""
+
+          if ! grep -q "workflow.md" CLAUDE.md; then
+            MISSING="$MISSING workflow.md"
+          fi
+
+          if ! grep -q "code-quality.md" CLAUDE.md; then
+            MISSING="$MISSING code-quality.md"
+          fi
+
+          if [ -n "$MISSING" ]; then
+            echo "::error::Missing imports in CLAUDE.md:$MISSING"
+            exit 1
+          fi
+          echo "✓ Required @imports present"
+
+      # 2. SECURITY CHECKS
+      - name: Check app-config.yml
+        run: |
+          if [ ! -f ".github/app-config.yml" ]; then
+            echo "::error::Missing .github/app-config.yml"
+            exit 1
+          fi
+
+          VISIBILITY=$(grep "visibility:" .github/app-config.yml | cut -d: -f2 | tr -d ' ')
+
+          if [ "$VISIBILITY" != "internal" ] && [ "$VISIBILITY" != "public" ]; then
+            echo "::error::Invalid visibility '$VISIBILITY' - must be 'internal' or 'public'"
+            exit 1
+          fi
+
+          echo "✓ Security config valid (visibility: $VISIBILITY)"
+
+      # 3. CI/CD CHECKS
+      - name: Check deploy workflow exists
+        run: |
+          if ls .github/workflows/deploy-*.yml 1> /dev/null 2>&1; then
+            echo "✓ Deploy workflow found"
+          else
+            echo "::error::No deploy workflow found"
+            exit 1
+          fi
+
+      # 4. TYPESCRIPT GATE
+      - name: Check TypeScript only in src/
+        run: |
+          JS_FILES=$(find src -name "*.js" -o -name "*.jsx" 2>/dev/null | grep -v node_modules || true)
+          if [ -n "$JS_FILES" ]; then
+            echo "::error::JavaScript files found in src/ - TypeScript only policy"
+            echo "$JS_FILES"
+            exit 1
+          fi
+          echo "✓ TypeScript gate passed (no .js/.jsx in src/)"
+
+      # 5. VERSION CHECK (Warning only)
+      - name: Check setup version
+        continue-on-error: true
+        run: |
+          if [ ! -f ".claude/setup-version.yml" ]; then
+            echo "::warning::No setup-version.yml found - consider running setup-claude.sh"
+            exit 0
+          fi
+
+          LOCAL_VERSION=$(grep "version:" .claude/setup-version.yml | cut -d: -f2 | tr -d ' "')
+          echo "✓ Setup version: $LOCAL_VERSION"
+
+      # 6. ZERO TRUST GATE
+      - name: Verify Access Protection (internal apps)
+        run: |
+          VISIBILITY=$(grep "visibility:" .github/app-config.yml | cut -d: -f2 | tr -d ' ')
+          if [ "$VISIBILITY" = "internal" ]; then
+            # Check Terraform config exists
+            if [ ! -f "infra/cloudflare-access/main.tf" ]; then
+              echo "::error::Internal app requires Access protection"
+              echo "Missing: infra/cloudflare-access/main.tf"
+              exit 1
+            fi
+            # Check Access Application resource exists
+            if ! grep -q "cloudflare_zero_trust_access_application\|cloudflare_access_application" infra/cloudflare-access/main.tf; then
+              echo "::error::No Access Application defined in Terraform"
+              exit 1
+            fi
+          fi
+          echo "✓ Zero Trust check passed"
+
+      # 7. VISIBILITY CHANGE AUDIT
+      - name: Check visibility change requires approval
+        if: github.event_name == 'pull_request'
+        run: |
+          # Check if visibility changed from internal to public
+          if git diff origin/main -- .github/app-config.yml 2>/dev/null | grep -E "^\+.*visibility.*public"; then
+            echo "::error::Visibility change to 'public' requires security-review label"
+            echo "Add label 'security-review-approved' to proceed"
+            exit 1
+          fi
+          echo "✓ No visibility regression"
+
+      # 8. REDWOOD CONTRACT
+      - name: Verify project structure
+        run: |
+          # Check for UI project (has worker.tsx)
+          if [ -f "src/worker.tsx" ]; then
+            # UI projects must use Redwood SDK
+            if [ -f "package.json" ]; then
+              if ! grep -q '"rwsdk"\|"@redwoodjs/' package.json; then
+                echo "::error::UI projects must use Redwood SDK"
+                exit 1
+              fi
+            fi
+            # Redwood projects need vite.config
+            if [ ! -f "vite.config.ts" ]; then
+              echo "::error::Redwood project missing vite.config.ts"
+              exit 1
+            fi
+            echo "✓ Redwood project structure valid"
+          else
+            # Serverless Worker (no UI) - allowed
+            echo "✓ Serverless Worker (no UI requirement)"
+          fi
+
+      # 9. SCOPE LOCK CHECK
+      - name: Check scope lock (write allowlist)
+        run: |
+          # settings.json muss existieren
+          if [ ! -f ".claude/settings.json" ]; then
+            echo "::error::Missing .claude/settings.json"
+            echo "Run setup-claude.sh to generate settings"
+            exit 1
+          fi
+
+          # permissions.write muss existieren
+          if ! jq -e '.permissions.write' .claude/settings.json > /dev/null 2>&1; then
+            echo "::error::Missing permissions.write in settings.json"
+            echo "Run setup-claude.sh to regenerate with scope lock"
+            exit 1
+          fi
+
+          # Kein **/* Wildcard erlaubt
+          if jq -e '.permissions.write | any(. == "**/*" or . == "**")' .claude/settings.json | grep -q true; then
+            echo "::error::permissions.write contains unrestricted wildcard **/*"
+            echo "Specify explicit paths to enable scope lock"
+            exit 1
+          fi
+
+          # Nicht leer
+          WRITE_COUNT=$(jq '.permissions.write | length' .claude/settings.json)
+          if [ "$WRITE_COUNT" -eq 0 ]; then
+            echo "::error::permissions.write is empty"
+            echo "Add allowed write paths to settings.json"
+            exit 1
+          fi
+
+          echo "✓ Scope lock: $WRITE_COUNT write paths configured"
