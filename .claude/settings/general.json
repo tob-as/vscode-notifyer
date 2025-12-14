@@ -48,10 +48,11 @@
       "Bash(docker logs:*)",
       "Bash(docker compose up:*)",
       "Bash(docker compose down:*)",
-      "Bash(docker compose:*)"
+      "Bash(docker compose:*)",
+      "Bash(rm:*)",
+      "Bash(tree:*)"
     ],
     "ask": [
-      "Bash(rm:*)",
       "Bash(git push:*)"
     ],
     "deny": [

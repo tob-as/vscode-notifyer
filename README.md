@@ -4,46 +4,26 @@ Meta-repository for KI-assisted development of **Serverless applications on Clou
 
 ## Quick Start
 
-### New Project (Recommended)
-
 ```bash
-# In Claude Code, use the /create command
-/create my-project-name
+/create my-app
+/design
+/build
 ```
 
-This creates a GitHub repo with full template setup.
+That's it. Redwood. No alternatives.
+
+### API-Only Projects
+
+```bash
+/create my-api --api-only
+```
 
 ### Existing Project
 
 ```bash
 cd ~/workspace/repos/my-project
-setup-claude.sh [profile]
-```
-
-## Profiles
-
-| Profile | Use Case | Description |
-|---------|----------|-------------|
-| `end-user` | Non-developers | Simplified workflow (default) |
-| `serverless` | API-only Workers | Edge compute, no UI |
-| `redwood` | Full-stack apps | **The only UI path** - RedwoodSDK with React Server Components |
-
-### Decision Tree
-
-```
-What are you building?
-        │
-        ├── No code / KI assistance only → end-user
-        │
-        ├── Pure API / Worker only → serverless
-        │
-        └── App with UI → redwood (only option)
-```
-
-```bash
-setup-claude.sh end-user    # Default - non-technical users
-setup-claude.sh serverless  # Pure Workers API (no UI)
-setup-claude.sh redwood     # Full-stack with UI (RedwoodSDK)
+setup-claude.sh redwood     # Full-stack with UI (default)
+setup-claude.sh serverless  # API-only (no UI)
 ```
 
 ## Core Commands
@@ -90,12 +70,11 @@ Key guides:
 
 ## Status
 
-**Phase:** Wave 5 (Hardening)
-**Version:** 0.4
+**Phase:** Wave 6 (Single Path)
+**Version:** 0.5
 
-Wave 5 changes:
-- Zero Trust compliance gate in CI
-- Redwood contract enforcement
-- Vitest testing foundation
-- TypeScript-only enforcement
-- Legacy cleanup complete
+Wave 6 changes:
+- Single Path: Redwood is the ONLY UI framework
+- No profile selection - automatic stack detection
+- Smart Permissions: rm + tree auto-allowed
+- Security-critical files require explicit approval
