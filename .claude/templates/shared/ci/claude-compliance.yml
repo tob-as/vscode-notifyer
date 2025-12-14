@@ -67,7 +67,18 @@ jobs:
             exit 1
           fi
 
-      # 4. VERSION CHECK (Warning only)
+      # 4. TYPESCRIPT GATE
+      - name: Check TypeScript only in src/
+        run: |
+          JS_FILES=$(find src -name "*.js" -o -name "*.jsx" 2>/dev/null | grep -v node_modules || true)
+          if [ -n "$JS_FILES" ]; then
+            echo "::error::JavaScript files found in src/ - TypeScript only policy"
+            echo "$JS_FILES"
+            exit 1
+          fi
+          echo "✓ TypeScript gate passed (no .js/.jsx in src/)"
+
+      # 5. VERSION CHECK (Warning only)
       - name: Check setup version
         continue-on-error: true
         run: |

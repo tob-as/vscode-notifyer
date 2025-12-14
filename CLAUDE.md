@@ -26,7 +26,7 @@
   /agents/             - Specialized agent configurations
   /skills/             - Reusable coding patterns and templates
   /settings/           - Hooks, automation rules, settings.json templates
-  /profiles/           - Cloudflare-focused profiles (end-user, serverless, redwood, microtool)
+  /profiles/           - Cloudflare-focused profiles (end-user, serverless, redwood)
   /instructions/       - Shared instruction sets
 /docs/                 - Guides, onboarding, reference material
 ```
@@ -94,12 +94,21 @@ For conflicts, use explicit overrides:
 - Package Manager: npm (not pnpm, legacy project)
 ```
 
+### Scope Lock Protocol
+
+When working in multi-repo environments:
+1. Check for `CLAUDE_SCOPE.md` to identify project boundaries
+2. Tab title should display: `[TOB] project-name — SCOPE LOCK`
+3. Restrict file operations to the current repository
+4. Use `/update` to sync with upstream improvements
+
 ### Git Workflow
 
 - Branch naming: `feature/[description]` or `fix/[description]`
 - Never commit directly to main
 - Run quality checks before committing
 - Use conventional commits: `feat:`, `fix:`, `refactor:`, `docs:`
+- TypeScript only in src/ (no .js files)
 
 ### Do Not
 
@@ -142,10 +151,14 @@ Persistent todos for this project. Add items here during sessions; review and cl
 
 - [x] Add version tracking to skills (completed Wave 3)
 - [x] Document cross-skill interaction (see docs/cross-skill-interaction.md)
+- [x] Redwood SDK as default UI framework (Wave 4)
+- [x] TypeScript-only enforcement (Wave 4)
+- [x] /create v2 with GitHub repo creation (Wave 4)
+- [x] /update command for upstream sync (Wave 4)
 
 ---
 
-*Last updated: 13.12.2025*
-*Phase: Cloudflare Focus / v0.3*
+*Last updated: 14.12.2025*
+*Phase: Redwood Standard / v0.4*
 # Project Overrides
 

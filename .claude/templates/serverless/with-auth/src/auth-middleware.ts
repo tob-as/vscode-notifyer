@@ -2,7 +2,7 @@
  * Authentication Middleware for workers-users integration
  *
  * Usage:
- *   import { verifySession, requireAuth } from './auth-middleware.js';
+ *   import { verifySession, requireAuth } from './auth-middleware';
  *
  *   // Check session
  *   const session = await verifySession(request, env);
@@ -12,12 +12,22 @@
  *   if (authResponse) return authResponse; // Returns 401 if not authenticated
  */
 
+export interface SessionData {
+  userId: string;
+  email: string;
+  [key: string]: unknown;
+}
+
+export interface AuthEnv {
+  SESSION_STATE?: Fetcher;
+  SESSION_STATE_URL?: string;
+  SESSIONS_KV?: KVNamespace;
+}
+
 /**
  * Get session cookie from request
- * @param {Request} request
- * @returns {string|null}
  */
-function getSessionCookie(request) {
+function getSessionCookie(request: Request): string | null {
   const cookieHeader = request.headers.get('Cookie');
   if (!cookieHeader) return null;
 
@@ -29,11 +39,8 @@ function getSessionCookie(request) {
 
 /**
  * Verify session with session-state worker
- * @param {Request} request
- * @param {object} env - Must have SESSION_STATE_URL or SESSION_STATE service binding
- * @returns {object|null} Session data or null if invalid
  */
-export async function verifySession(request, env) {
+export async function verifySession(request: Request, env: AuthEnv): Promise<SessionData | null> {
   const sessionId = getSessionCookie(request);
   if (!sessionId) return null;
 
@@ -44,20 +51,20 @@ export async function verifySession(request, env) {
         new Request(`https://session/get/${sessionId}`)
       );
       if (!response.ok) return null;
-      return await response.json();
+      return await response.json() as SessionData;
     }
 
     // Option 2: HTTP call to session-state worker
     if (env.SESSION_STATE_URL) {
       const response = await fetch(`${env.SESSION_STATE_URL}/get/${sessionId}`);
       if (!response.ok) return null;
-      return await response.json();
+      return await response.json() as SessionData;
     }
 
     // Option 3: Direct KV access (if session KV is bound)
     if (env.SESSIONS_KV) {
       const session = await env.SESSIONS_KV.get(sessionId, 'json');
-      return session;
+      return session as SessionData | null;
     }
 
     console.error('No session verification method configured');
@@ -70,11 +77,8 @@ export async function verifySession(request, env) {
 
 /**
  * Middleware that returns 401 if not authenticated
- * @param {Request} request
- * @param {object} env
- * @returns {Response|null} Returns Response if unauthorized, null if OK
  */
-export async function requireAuth(request, env) {
+export async function requireAuth(request: Request, env: AuthEnv): Promise<Response | null> {
   const session = await verifySession(request, env);
 
   if (!session) {
@@ -89,17 +93,7 @@ export async function requireAuth(request, env) {
 
 /**
  * Extract user info from session
- * @param {Request} request
- * @param {object} env
- * @returns {object|null} User info { userId, email, ... }
  */
-export async function getCurrentUser(request, env) {
-  const session = await verifySession(request, env);
-  if (!session) return null;
-
-  return {
-    userId: session.userId,
-    email: session.email,
-    ...session
-  };
+export async function getCurrentUser(request: Request, env: AuthEnv): Promise<SessionData | null> {
+  return await verifySession(request, env);
 }

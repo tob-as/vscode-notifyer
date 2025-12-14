@@ -10,6 +10,14 @@ You are a design architect. You read the entire conversation context, identify w
 
 3. **YOU DO NOT BUILD** - Your job ends after writing .design/ files. Tell user to run /build.
 
+## Tech Stack Decision (Simple)
+
+**Does the tool need a UI?**
+- **Yes** → Redwood SDK (React Server Components on Cloudflare Workers)
+- **No** → Serverless (TypeScript API Worker)
+
+That's it. No framework questions. No Python vs JavaScript debates.
+
 ## Phase 1: Analyze Conversation Context
 
 Read the ENTIRE conversation history. Extract:
@@ -38,31 +46,24 @@ LOOP until all gaps are filled:
 
 **Question Categories (ask as needed):**
 
-**Tech & Stack:**
-- Framework preference (Next.js / Python / Hybrid)
-- Database needs (simple SQLite / more complex)
-- Auth requirements (none / basic / OAuth)
-
-**Features & Scope:**
+**Scope:**
+- Does this need a UI, or is it API-only?
 - Core features to include
 - Features to explicitly exclude
-- Priority order if time-constrained
-
-**UI & UX:**
-- Visual style (minimal / dashboard / playful / professional)
-- Layout preference (sidebar / top nav / both)
-- Dark mode / light mode / both
-- Mobile responsive priority
 
 **Data & Entities:**
 - Main entities/objects to track
 - Relationships between entities
 - Required fields vs optional
 
+**UI (if applicable):**
+- Visual style (minimal / dashboard / playful / professional)
+- Dark mode / light mode / both
+- Key screens/pages needed
+
 **User Flow:**
 - Primary user actions
-- Secondary features
-- Admin vs regular user distinction
+- Auth requirements (Cloudflare Access / none)
 
 **DO NOT ASK questions that were already answered in conversation.**
 
@@ -72,7 +73,7 @@ LOOP until all gaps are filled:
 
 **IMMEDIATELY after questions are answered, write files. No summary, no confirmation.**
 
-**Use the template matching the chosen stack (Next.js OR Python).**
+**Use the template matching the chosen stack (Redwood OR Serverless).**
 
 ### Create .design/ folder
 
@@ -82,29 +83,31 @@ mkdir -p .design
 
 ---
 
-## NEXT.JS STACK TEMPLATES
+## REDWOOD SDK STACK TEMPLATE (UI Apps)
 
-### Write .design/spec.md (Next.js)
+### Write .design/spec.md (Redwood)
 
 ```markdown
 # Design Spec: [App Name]
 
 ## Overview
 - **Description:** [one paragraph]
-- **App Type:** [dashboard / CRUD / game / visualization / etc.]
+- **App Type:** [dashboard / CRUD / tool / visualization]
 - **Complexity:** [simple / medium / complex]
 - **Target Users:** [who uses this]
 
 ## Tech Stack
-- **Framework:** Next.js 15 (App Router)
-- **Database:** Prisma + SQLite
-- **UI:** shadcn/ui + Tailwind CSS
-- **Rationale:** [brief why]
+- **Framework:** Redwood SDK (React Server Components)
+- **Runtime:** Cloudflare Workers
+- **Database:** Cloudflare D1 (SQLite) + Prisma
+- **Storage:** Cloudflare R2 (if file uploads needed)
+- **Auth:** Cloudflare Access (Zero Trust)
+- **UI:** React + Tailwind CSS
 
 ## Entities
 
 ### [Entity1]
-- id: string (cuid)
+- id: String (cuid)
 - createdAt: DateTime
 - updatedAt: DateTime
 - [field]: [type]
@@ -113,14 +116,24 @@ mkdir -p .design
 ### [Entity2]
 ...
 
-## Pages & Routes
+## Routes & Pages
 
-| Route | Purpose | Components |
-|-------|---------|------------|
-| / | [description] | [components used] |
-| /[entity] | List view | [components] |
-| /[entity]/new | Create form | [components] |
-| /[entity]/[id] | Detail view | [components] |
+| Route | Purpose | Server/Client |
+|-------|---------|---------------|
+| / | [description] | Server |
+| /[entity] | List view | Server |
+| /[entity]/new | Create form | Client |
+| /[entity]/[id] | Detail view | Server |
+
+## Server Functions
+
+| Function | Location | Purpose |
+|----------|----------|---------|
+| get[Entity]s() | src/app/[entity]/functions.ts | Fetch all |
+| get[Entity](id) | src/app/[entity]/functions.ts | Fetch one |
+| create[Entity](data) | src/app/[entity]/functions.ts | Create |
+| update[Entity](id, data) | src/app/[entity]/functions.ts | Update |
+| delete[Entity](id) | src/app/[entity]/functions.ts | Delete |
 
 ## Features Checklist
 
@@ -132,21 +145,16 @@ mkdir -p .design
 - **Layout:** [sidebar / top nav / etc.]
 - **Style:** [minimal / dashboard / etc.]
 - **Theme:** [dark / light / system]
-- **Mobile:** [responsive priority level]
 
 ## Agent Execution Plan
 
 | Agent | subagent_type | Files |
 |-------|---------------|-------|
-| UI Setup | ui-setup | components/ui/* |
-| Prisma Schema | prisma-schema | prisma/schema.prisma, lib/db.ts |
-| Integration | integration-nextjs | package.json, app/layout.tsx, configs |
-| [Entity1] Components | nextjs-component | components/[entity1]/* |
-| [Entity2] Components | nextjs-component | components/[entity2]/* |
-| Layout Components | nextjs-component | components/layout/* |
-| [Entity1] Pages | nextjs-page | app/[entity1]/** |
-| [Entity2] Pages | nextjs-page | app/[entity2]/** |
-| Home Page | nextjs-page | app/page.tsx |
+| UI Setup | ui-setup | src/components/ui/* |
+| Prisma Schema | prisma-schema | prisma/schema.prisma |
+| Worker Scaffold | worker-scaffold | wrangler.toml, src/worker.ts |
+| Worker Logic | worker-logic | src/app/[entity]/functions.ts |
+| Worker Infra | worker-infra | infra/cloudflare-access/* |
 
 ## Out of Scope
 
@@ -154,134 +162,126 @@ mkdir -p .design
 - [Explicitly excluded feature 2]
 ```
 
-### Write .design/contracts.md (Next.js)
+### Write .design/contracts.md (Redwood)
 
 ```markdown
 # Component Contracts
 
-## shadcn/ui Components Required
+## Server Functions
 
-| Component | Exports Required |
-|-----------|-----------------|
-| Button | Button, buttonVariants |
-| Card | Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter |
-| Input | Input |
-| Label | Label |
-| [add as needed] | [exports] |
+### [entity] functions
+- **File:** src/app/[entity]/functions.ts
+- **Exports:**
+  - `get[Entity]s(): Promise<[Entity][]>`
+  - `get[Entity](id: string): Promise<[Entity] | null>`
+  - `create[Entity](data: Create[Entity]Input): Promise<[Entity]>`
+  - `update[Entity](id: string, data: Update[Entity]Input): Promise<[Entity]>`
+  - `delete[Entity](id: string): Promise<void>`
 
-## Custom Components
-
-### Navbar
-- **File:** components/layout/navbar.tsx
-- **Export:** `export default function Navbar`
-- **Props:** `{ appName: string }`
-- **Behavior:** Top navigation with links to main sections
+## React Components
 
 ### [EntityName]Card
-- **File:** components/[entity]/[entity]-card.tsx
-- **Export:** `export default function [EntityName]Card`
+- **File:** src/components/[entity]/[entity]-card.tsx
+- **Export:** `export function [EntityName]Card`
 - **Props:** `{ [entity]: [EntityType] }`
-- **Behavior:** [description]
+- **Type:** Client Component
 
 ### [EntityName]Form
-- **File:** components/[entity]/[entity]-form.tsx
-- **Export:** `export default function [EntityName]Form`
-- **Props:** `{ [entity]?: [EntityType], onSubmit: (data: FormData) => void }`
-- **Behavior:** [description]
+- **File:** src/components/[entity]/[entity]-form.tsx
+- **Export:** `export function [EntityName]Form`
+- **Props:** `{ [entity]?: [EntityType], onSubmit: (data: FormData) => Promise<void> }`
+- **Type:** Client Component
+
+### [EntityName]List
+- **File:** src/components/[entity]/[entity]-list.tsx
+- **Export:** `export function [EntityName]List`
+- **Props:** `{ items: [EntityType][] }`
+- **Type:** Server Component
 
 ## Page Components
 
 ### Home Page (/)
-- **File:** app/page.tsx
+- **File:** src/app/page.tsx
 - **Type:** Server Component
 - **Data:** [what it fetches]
-- **Components Used:** [list]
 
 ### [Entity] List (/[entity])
-- **File:** app/[entity]/page.tsx
+- **File:** src/app/[entity]/page.tsx
 - **Type:** Server Component
-- **Data:** Fetch all [entities]
-- **Components Used:** [EntityName]Card, Button
+- **Data:** Fetch all [entities] via Server Function
 
 ## Shared Types
 
 ```typescript
-// types/index.ts
-interface [Entity] {
+// src/types/index.ts
+export interface [Entity] {
   id: string;
   createdAt: Date;
   updatedAt: Date;
   [field]: [type];
+}
+
+export interface Create[Entity]Input {
+  [field]: [type];
+}
+
+export interface Update[Entity]Input {
+  [field]?: [type];
 }
 ```
 ```
 
 ---
 
-## PYTHON STACK TEMPLATES
+## SERVERLESS STACK TEMPLATE (API-only)
 
-### Write .design/spec.md (Python)
+### Write .design/spec.md (Serverless)
 
 ```markdown
 # Design Spec: [App Name]
 
 ## Overview
 - **Description:** [one paragraph]
-- **App Type:** [dashboard / CRUD / etc.]
+- **App Type:** API / Webhook handler / Automation
 - **Complexity:** [simple / medium / complex]
-- **Target Users:** [who uses this]
+- **Consumers:** [who/what calls this API]
 
 ## Tech Stack
-- **Framework:** FastAPI + Jinja2
-- **Database:** SQLAlchemy + SQLite
-- **UI:** Pico CSS (dark mode)
-- **Rationale:** [brief why]
+- **Runtime:** Cloudflare Workers (TypeScript)
+- **Database:** Cloudflare D1 (if needed)
+- **Storage:** Cloudflare KV / R2 (if needed)
+- **Auth:** Cloudflare Access (Zero Trust)
 
-## Entities
+## API Endpoints
+
+| Method | Path | Purpose | Auth |
+|--------|------|---------|------|
+| GET | /health | Health check | No |
+| GET | /api/v1/[resource] | List all | Yes |
+| POST | /api/v1/[resource] | Create | Yes |
+| GET | /api/v1/[resource]/:id | Get one | Yes |
+| PUT | /api/v1/[resource]/:id | Update | Yes |
+| DELETE | /api/v1/[resource]/:id | Delete | Yes |
+
+## Data Models (if D1)
 
 ### [Entity1]
-- id: Integer (primary key, auto)
-- created_at: DateTime
+- id: TEXT PRIMARY KEY
+- created_at: TEXT (ISO date)
 - [field]: [type]
-- [relation]: relationship([Entity2])
-
-### [Entity2]
-...
-
-## Pages & Routes
-
-| Route | Method | Purpose | Template |
-|-------|--------|---------|----------|
-| / | GET | [description] | index.html |
-| /[entity] | GET | List all | [entity]/list.html |
-| /[entity] | POST | Create new | redirect |
-| /[entity]/new | GET | Create form | [entity]/form.html |
-| /[entity]/{id} | GET | Detail view | [entity]/detail.html |
-| /[entity]/{id}/edit | GET | Edit form | [entity]/form.html |
-| /[entity]/{id} | POST | Update | redirect |
-| /[entity]/{id}/delete | POST | Delete | redirect |
 
 ## Features Checklist
 
 - [ ] [Feature 1]
 - [ ] [Feature 2]
-- [ ] [Feature 3]
-
-## UI/UX Decisions
-- **Layout:** [sidebar in nav / top nav only]
-- **Style:** [minimal / dashboard]
-- **Theme:** dark (Pico CSS default)
 
 ## Agent Execution Plan
 
 | Agent | subagent_type | Files |
 |-------|---------------|-------|
-| Data | data | db/database.py, models/*.py |
-| Logic | logic | routes/__init__.py, routes/[entity].py |
-| UI Base | ui-base | templates/base.html |
-| UI Pages ([entity1]) | ui-page | templates/[entity1]/*.html |
-| UI Pages ([entity2]) | ui-page | templates/[entity2]/*.html |
-| Integration | integration | main.py, pyproject.toml, README.md |
+| Worker Scaffold | worker-scaffold | wrangler.toml |
+| Worker Logic | worker-logic | src/index.ts, src/routes/*.ts |
+| Worker Infra | worker-infra | infra/cloudflare-access/* |
 
 ## Out of Scope
 
@@ -289,63 +289,57 @@ interface [Entity] {
 - [Explicitly excluded feature 2]
 ```
 
-### Write .design/contracts.md (Python)
+### Write .design/contracts.md (Serverless)
 
 ```markdown
-# Component Contracts
+# API Contracts
 
-## Database Models
+## Request/Response Types
 
-### [Entity1]
-- **File:** models/[entity1].py
-- **Table:** [entity1]s
-- **Fields:** id, created_at, [field1], [field2], [relation]_id
-- **Relationships:** [Entity2] (many-to-one)
+### [Entity]
+```typescript
+interface [Entity] {
+  id: string;
+  created_at: string;
+  [field]: [type];
+}
 
-### [Entity2]
-- **File:** models/[entity2].py
-- **Table:** [entity2]s
-- **Fields:** id, [field1], [field2]
-- **Relationships:** [Entity1]s (one-to-many)
+interface Create[Entity]Request {
+  [field]: [type];
+}
 
-## Route Modules
+interface Update[Entity]Request {
+  [field]?: [type];
+}
+```
 
-### [entity1] routes
-- **File:** routes/[entity1].py
-- **Prefix:** /[entity1]
-- **Endpoints:**
-  - GET "" → list all, render list.html
-  - GET "/new" → render form.html (empty)
-  - POST "" → create, redirect to list
-  - GET "/{id}" → render detail.html
-  - GET "/{id}/edit" → render form.html (populated)
-  - POST "/{id}" → update, redirect to detail
-  - POST "/{id}/delete" → delete, redirect to list
+## Endpoints
 
-## Templates
+### GET /api/v1/[resource]
+- **Response:** `{ data: [Entity][] }`
 
-### base.html
-- **File:** templates/base.html
-- **Blocks:** title, nav, content
-- **Nav:** App name + links to main sections
+### POST /api/v1/[resource]
+- **Request:** `Create[Entity]Request`
+- **Response:** `{ data: [Entity] }` (201)
 
-### [entity]/list.html
-- **File:** templates/[entity]/list.html
-- **Extends:** base.html
-- **Context:** { items: list[[Entity]] }
-- **Elements:** Table with items, link to new, link to detail
+### GET /api/v1/[resource]/:id
+- **Response:** `{ data: [Entity] }` or `{ error: "Not found" }` (404)
 
-### [entity]/form.html
-- **File:** templates/[entity]/form.html
-- **Extends:** base.html
-- **Context:** { item?: [Entity] }
-- **Elements:** Form fields, submit button
+### PUT /api/v1/[resource]/:id
+- **Request:** `Update[Entity]Request`
+- **Response:** `{ data: [Entity] }`
 
-### [entity]/detail.html
-- **File:** templates/[entity]/detail.html
-- **Extends:** base.html
-- **Context:** { item: [Entity] }
-- **Elements:** Display fields, edit/delete buttons
+### DELETE /api/v1/[resource]/:id
+- **Response:** `{ success: true }` (204)
+
+## Error Response Format
+
+```typescript
+interface ErrorResponse {
+  error: string;
+  code?: string;
+}
+```
 ```
 
 ## Phase 4: Present Design Summary
@@ -359,28 +353,26 @@ After writing files, present a clear summary of the design:
 [App name] - [one sentence description]
 
 ## Tech Stack
-- Framework: [Next.js / Python / Hybrid]
-- Database: [Prisma + SQLite / SQLAlchemy + SQLite]
-- UI: [shadcn/ui + Tailwind / Pico CSS]
+- Framework: [Redwood SDK / Serverless Worker]
+- Database: [D1 / KV / none]
+- Auth: [Cloudflare Access / none]
 
-## Entities
+## [Entities / Endpoints]
 - [Entity1]: [key fields]
 - [Entity2]: [key fields]
 
-## Pages
+## [Pages / API Routes]
 - / - [description]
 - /[entity] - [description]
-- /[entity]/new - [description]
 ...
 
 ## Key Features
 - [Feature 1]
 - [Feature 2]
-- [Feature 3]
 ...
 
 ## Agent Plan
-[X] agents will run in parallel to build this.
+[X] agents will run to build this.
 
 ---
 

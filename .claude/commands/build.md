@@ -46,27 +46,23 @@ STOP. Do not proceed.
 
 Launch ALL agents specified in that table, in parallel, using a single message with multiple Task tool calls.
 
-### Next.js Stack Agents
+### Redwood SDK Stack Agents (UI Apps)
 
-Use these named agents (skills are auto-loaded via frontmatter):
+| Agent | subagent_type | Skills Auto-Loaded | Files |
+|-------|---------------|-------------------|-------|
+| UI Setup | `ui-setup` | tailwind-patterns, react-patterns | src/components/ui/* |
+| Prisma Schema | `prisma-schema` | prisma-patterns | prisma/schema.prisma |
+| Worker Scaffold | `worker-scaffold` | cloudflare-workers-patterns | wrangler.toml |
+| Worker Logic | `worker-logic` | cloudflare-workers-patterns | src/app/**/functions.ts |
+| Worker Infra | `worker-infra` | cloudflare-workers-patterns | infra/cloudflare-access/* |
 
-| Agent | subagent_type | Skills Auto-Loaded |
-|-------|---------------|-------------------|
-| UI Setup | `ui-setup` | tailwind-patterns |
-| Prisma Schema | `prisma-schema` | prisma-patterns |
-| Integration | `integration-nextjs` | nextjs-patterns, tailwind-patterns |
-| Component | `nextjs-component` | react-patterns, tailwind-patterns, nextjs-patterns |
-| Page | `nextjs-page` | nextjs-patterns, react-patterns, tailwind-patterns, prisma-patterns |
+### Serverless Stack Agents (API-only)
 
-### Python Stack Agents
-
-| Agent | subagent_type | Skills Auto-Loaded |
-|-------|---------------|-------------------|
-| Data | `data` | sqlalchemy-patterns |
-| Logic | `logic` | fastapi-patterns, sqlalchemy-patterns |
-| UI Base | `ui-base` | ui-design-patterns |
-| UI Page | `ui-page` | ui-design-patterns, fastapi-patterns |
-| Integration | `integration` | fastapi-patterns, sqlalchemy-patterns |
+| Agent | subagent_type | Skills Auto-Loaded | Files |
+|-------|---------------|-------------------|-------|
+| Worker Scaffold | `worker-scaffold` | cloudflare-workers-patterns | wrangler.toml |
+| Worker Logic | `worker-logic` | cloudflare-workers-patterns | src/index.ts, src/routes/*.ts |
+| Worker Infra | `worker-infra` | cloudflare-workers-patterns | infra/cloudflare-access/* |
 
 ### Launch Pattern
 
@@ -88,36 +84,37 @@ Execute exactly as specified. Do not add features or change the design.
 
 **Skills are auto-loaded** from the agent's frontmatter - no need to insert standards manually.
 
-**OPTIMIZATION:** While agents work, start package installation in background:
-- Next.js: `npm install &`
-- Python: `uv sync &`
-
 ## Phase 3: Pre-Build Validation
 
 **Run AFTER agents complete, BEFORE running the app.**
 
-**Parallel checks:**
-1. Read package.json - verify dependencies match spec
-2. Read app/layout.tsx - verify Navbar imported
-3. Read .env - verify DATABASE_URL is absolute path
-4. Glob components/**/*.tsx - check "use client" directives
-5. Glob app/**/page.tsx - check Button+Link patterns
+### Redwood SDK Checks:
+1. Read wrangler.toml - verify worker configuration
+2. Read prisma/schema.prisma - verify entities match spec
+3. Glob src/components/**/*.tsx - check client/server component patterns
+4. Verify TypeScript files only in src/ (no .js files)
+
+### Serverless Checks:
+1. Read wrangler.toml - verify worker configuration
+2. Read src/index.ts - verify routes match spec
+3. Verify TypeScript files only in src/ (no .js files)
 
 **Fix any issues found.** These are implementation errors, not design changes.
 
 ## Phase 4: Install & Run
 
-### Next.js:
+### Redwood SDK:
 ```bash
-# npm install should be done (started in Phase 2)
+npm install
+npx prisma generate
 npx prisma db push
 npm run dev
 ```
 
-### Python:
+### Serverless:
 ```bash
-# uv sync should be done (started in Phase 2)
-uv run python main.py
+npm install
+npx wrangler dev
 ```
 
 **Fix any startup errors.** These are implementation errors, not design changes.
@@ -126,25 +123,33 @@ uv run python main.py
 
 Provide simple run instructions:
 
-**Next.js:**
+### Redwood SDK:
 ```
 Your [app_name] is ready!
 
-To run:
+To run locally:
 1. npm install
 2. npx prisma db push
 3. npm run dev
-4. Open http://localhost:3000
+4. Open http://localhost:5173
+
+To deploy:
+1. Push to main branch
+2. GitHub Action deploys to Cloudflare Workers
 ```
 
-**Python:**
+### Serverless:
 ```
 Your [app_name] is ready!
 
-To run:
-1. uv sync
-2. uv run python main.py
-3. Open http://localhost:8000
+To run locally:
+1. npm install
+2. npx wrangler dev
+3. API available at http://localhost:8787
+
+To deploy:
+1. Push to main branch
+2. GitHub Action deploys to Cloudflare Workers
 ```
 
 ## Phase 6: QA
@@ -156,13 +161,6 @@ To run:
 - `qa-design` agent: Visual review, spacing/layout fixes, UX improvements
 
 **For now:** Skip this phase. User testing in Phase 7 serves as manual QA.
-
-**When implemented, workflow will be:**
-```
-main (working app)
-  ├─ feature/qa-testing   (Testing Agent)
-  └─ feature/qa-design    (Design Agent)
-```
 
 ## Phase 7: User Testing
 
@@ -189,7 +187,7 @@ Task tool with subagent_type: "build-reporter"
 
 Prompt:
 PROJECT: [project name]
-STACK: [Next.js / Python]
+STACK: [Redwood SDK / Serverless]
 
 Review the entire build conversation and create a comprehensive report documenting:
 - All errors encountered and how they were resolved
@@ -204,12 +202,13 @@ Save to ~/workspace/tob-claude-internal/reports/[project-name]-build-report.md
 
 ## DO NOT
 
-- Make design decisions (stack, features, UI style)
+- Make design decisions (features, UI style)
 - Add features not in spec.md
 - Change component structure from contracts.md
 - Ask clarifying questions about what to build
 - Improvise agent structure
 - Skip reading .design/ files
+- Use JavaScript files (TypeScript only)
 
 ## IF UNCLEAR
 

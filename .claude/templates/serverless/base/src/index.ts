@@ -4,8 +4,14 @@
  * Minimal starter template. Customize the fetch handler for your needs.
  */
 
+export interface Env {
+  // Add your bindings here, e.g.:
+  // MY_KV: KVNamespace;
+  // MY_DB: D1Database;
+}
+
 export default {
-  async fetch(request, env, ctx) {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
 
     // Health check endpoint

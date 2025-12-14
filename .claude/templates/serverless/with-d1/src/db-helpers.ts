@@ -2,40 +2,47 @@
  * D1 Database Helpers
  *
  * Usage:
- *   import { Database } from './db-helpers.js';
+ *   import { Database } from './db-helpers';
  *   const db = new Database(env.DB);
  *   const user = await db.findOne('users', { email: 'test@example.com' });
  */
 
+export interface QueryOptions {
+  limit?: number;
+  offset?: number;
+  orderBy?: string;
+}
+
 export class Database {
-  constructor(d1) {
+  private d1: D1Database;
+
+  constructor(d1: D1Database) {
     this.d1 = d1;
   }
 
   /**
    * Find one record by conditions
-   * @param {string} table
-   * @param {object} where - { column: value }
    */
-  async findOne(table, where) {
+  async findOne<T = Record<string, unknown>>(table: string, where: Record<string, unknown>): Promise<T | null> {
     const keys = Object.keys(where);
     const conditions = keys.map(k => `${k} = ?`).join(' AND ');
     const values = Object.values(where);
 
     return await this.d1.prepare(
       `SELECT * FROM ${table} WHERE ${conditions} LIMIT 1`
-    ).bind(...values).first();
+    ).bind(...values).first() as T | null;
   }
 
   /**
    * Find all records by conditions
-   * @param {string} table
-   * @param {object} where - { column: value }
-   * @param {object} options - { limit, offset, orderBy }
    */
-  async findAll(table, where = {}, options = {}) {
+  async findAll<T = Record<string, unknown>>(
+    table: string,
+    where: Record<string, unknown> = {},
+    options: QueryOptions = {}
+  ): Promise<T[]> {
     let sql = `SELECT * FROM ${table}`;
-    const values = [];
+    const values: unknown[] = [];
 
     if (Object.keys(where).length > 0) {
       const conditions = Object.keys(where).map(k => `${k} = ?`).join(' AND ');
@@ -56,15 +63,13 @@ export class Database {
     }
 
     const { results } = await this.d1.prepare(sql).bind(...values).all();
-    return results;
+    return results as T[];
   }
 
   /**
    * Insert a record
-   * @param {string} table
-   * @param {object} data
    */
-  async insert(table, data) {
+  async insert(table: string, data: Record<string, unknown>): Promise<number> {
     const keys = Object.keys(data);
     const placeholders = keys.map(() => '?').join(', ');
     const values = Object.values(data);
@@ -78,11 +83,12 @@ export class Database {
 
   /**
    * Update records
-   * @param {string} table
-   * @param {object} data - Data to update
-   * @param {object} where - Conditions
    */
-  async update(table, data, where) {
+  async update(
+    table: string,
+    data: Record<string, unknown>,
+    where: Record<string, unknown>
+  ): Promise<number> {
     const setClause = Object.keys(data).map(k => `${k} = ?`).join(', ');
     const whereClause = Object.keys(where).map(k => `${k} = ?`).join(' AND ');
     const values = [...Object.values(data), ...Object.values(where)];
@@ -96,10 +102,8 @@ export class Database {
 
   /**
    * Delete records
-   * @param {string} table
-   * @param {object} where
    */
-  async delete(table, where) {
+  async delete(table: string, where: Record<string, unknown>): Promise<number> {
     const whereClause = Object.keys(where).map(k => `${k} = ?`).join(' AND ');
     const values = Object.values(where);
 
@@ -112,10 +116,8 @@ export class Database {
 
   /**
    * Execute raw SQL
-   * @param {string} sql
-   * @param {array} params
    */
-  async raw(sql, params = []) {
-    return await this.d1.prepare(sql).bind(...params).all();
+  async raw<T = Record<string, unknown>>(sql: string, params: unknown[] = []): Promise<D1Result<T>> {
+    return await this.d1.prepare(sql).bind(...params).all() as D1Result<T>;
   }
 }
