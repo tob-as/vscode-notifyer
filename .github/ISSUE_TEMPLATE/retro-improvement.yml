@@ -1,0 +1,65 @@
+name: Retro Improvement
+description: System improvement identified during retrospective
+title: "[Meta]: "
+labels: ["type:meta"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template for process improvements, tooling updates, or system changes identified during sprint retrospectives.
+
+  - type: textarea
+    id: observation
+    attributes:
+      label: Observation
+      description: What did we observe that needs improvement?
+      placeholder: "Deployments take too long because..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact
+      description: How does this affect the team or product?
+      placeholder: |
+        - Slows down iteration speed
+        - Causes frustration during deployments
+        - Increases error rate
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-change
+    attributes:
+      label: Proposed Change
+      description: What should we do about it?
+      placeholder: |
+        1. Implement caching for build artifacts
+        2. Add parallel test execution
+        3. Update deployment scripts
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: applies-to
+    attributes:
+      label: Applies To
+      description: Which areas does this improvement affect?
+      options:
+        - label: Agents
+        - label: Skills
+        - label: Commands
+        - label: Documentation
+        - label: CI/CD
+        - label: Templates
+        - label: Process
+
+  - type: textarea
+    id: success-metrics
+    attributes:
+      label: Success Metrics
+      description: How will we know this improvement worked?
+      placeholder: "Deploy time reduced from 10 min to 5 min"
+    validations:
+      required: false

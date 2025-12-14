@@ -35,15 +35,27 @@ setup-claude.sh serverless  # API-only (no UI)
 | `/build` | Build phase - execute spec |
 | `/update` | Sync from upstream templates |
 
+### Product Commands
+
+| Command | Description |
+|---------|-------------|
+| `/intake` | Business use case to PRD |
+| `/breakdown` | PRD to user stories (INVEST) |
+| `/sprint-plan` | Sprint planning with WIP limits |
+| `/release` | SemVer release with changelog |
+| `/retro` | Sprint retrospective |
+
 ## Documentation
 
 See [docs/INDEX.md](docs/INDEX.md) for complete documentation index.
 
 Key guides:
+- [Product OS](docs/PRODUCT_OS.md) - End-to-end process overview
 - [First Deploy](docs/FIRST_DEPLOY.md) - Cloudflare Workers deployment
 - [Testing Guide](docs/TESTING.md) - Vitest setup and patterns
 - [Security Policy](docs/SECURITY.md) - Zero Trust requirements
-- [Secrets Management](docs/SECRETS.md) - Handling secrets
+- [Versioning](docs/VERSIONING.md) - SemVer guidelines
+- [Release Process](docs/RELEASE_PROCESS.md) - Branch strategy
 
 ## Architecture
 
@@ -70,11 +82,12 @@ Key guides:
 
 ## Status
 
-**Phase:** Wave 6 (Single Path)
-**Version:** 0.5
+**Phase:** Wave 7 (Product OS)
+**Version:** 0.6
 
-Wave 6 changes:
-- Single Path: Redwood is the ONLY UI framework
-- No profile selection - automatic stack detection
-- Smart Permissions: rm + tree auto-allowed
-- Security-critical files require explicit approval
+Wave 7 changes:
+- Product Operating System: /intake → /breakdown → /sprint-plan → /release → /retro
+- 7 new agents: product-owner, researcher, sprint-planner, qa-tester, release-manager, docs-keeper, retro-facilitator
+- GitHub Issue Forms (feature, story, bug, security, retro-improvement)
+- Release Drafter automation
+- SemVer and Conventional Commits documentation

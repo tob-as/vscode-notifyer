@@ -1,0 +1,73 @@
+name: Bug Report
+description: Report something that isn't working correctly
+title: "[Bug]: "
+labels: ["type:bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please provide as much detail as possible to help us reproduce and fix the issue.
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: How can we reproduce this bug?
+      placeholder: |
+        1. Go to '...'
+        2. Click on '...'
+        3. Scroll down to '...'
+        4. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What should happen?
+      placeholder: "The page should load successfully"
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What actually happens?
+      placeholder: "Error 500 is displayed"
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Where does this occur?
+      placeholder: |
+        - Browser: Chrome 120
+        - OS: macOS 14
+        - Environment: Production / Staging / Local
+    validations:
+      required: true
+
+  - type: dropdown
+    id: security
+    attributes:
+      label: Security Relevant?
+      description: Does this bug have security implications?
+      options:
+        - "No"
+        - "Yes - potential data exposure"
+        - "Yes - authentication/authorization issue"
+        - "Yes - other (explain below)"
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / Screenshots
+      description: Any relevant error messages, logs, or screenshots
+    validations:
+      required: false

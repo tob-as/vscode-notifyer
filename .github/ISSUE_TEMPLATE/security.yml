@@ -1,0 +1,78 @@
+name: Security Issue
+description: Report a security concern or vulnerability
+title: "[Security]: "
+labels: ["type:security"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **IMPORTANT**: For critical vulnerabilities, contact the security team directly before creating a public issue.
+
+        This template is for security improvements and non-critical security concerns.
+
+  - type: textarea
+    id: threat
+    attributes:
+      label: Threat / Risk
+      description: What security threat or risk does this address?
+      placeholder: "API endpoint exposes sensitive data without authentication"
+    validations:
+      required: true
+
+  - type: textarea
+    id: affected
+    attributes:
+      label: Affected Systems
+      description: Which systems, services, or components are affected?
+      placeholder: |
+        - Service: user-api
+        - Endpoint: /api/users
+        - Environment: Production
+    validations:
+      required: true
+
+  - type: textarea
+    id: mitigation
+    attributes:
+      label: Mitigation Plan
+      description: How should this be addressed?
+      placeholder: |
+        1. Add authentication middleware
+        2. Implement rate limiting
+        3. Add audit logging
+    validations:
+      required: true
+
+  - type: dropdown
+    id: zero-trust
+    attributes:
+      label: Zero Trust Regression Risk
+      description: Could this affect our Zero Trust / Cloudflare Access setup?
+      options:
+        - "No"
+        - "Yes - may bypass Access"
+        - "Yes - changes visibility requirements"
+        - "Unsure - needs review"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      description: How severe is this security issue?
+      options:
+        - Low - Minor improvement
+        - Medium - Should be fixed soon
+        - High - Needs immediate attention
+        - Critical - Production incident
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Any other relevant information
+    validations:
+      required: false
