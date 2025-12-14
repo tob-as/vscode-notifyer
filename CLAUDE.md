@@ -166,10 +166,16 @@ Persistent todos for this project. Add items here during sessions; review and cl
 - [x] Profile auto-detection in setup-claude.sh (Wave 9)
 - [x] All skills/commands always available (Wave 9)
 - [x] Simplified profiles - only control Scope Lock (Wave 9)
+- [x] Smart permission hook - auto-approve safe ops (Wave 10)
+- [x] wrangler deploy blocked locally (CI-only) (Wave 10)
+- [x] CLAUDE_ENV_FILE for persistent secrets (Wave 10)
+- [x] Preflight checks for missing secrets (Wave 10)
+- [x] workers_dev=false security hardening (Wave 10)
+- [x] RedwoodSDK documentation (vs Redwood GraphQL) (Wave 10)
 
 ---
 
 *Last updated: 14.12.2025*
-*Phase: Profile Simplification / v0.8*
+*Phase: Engineering OS - Security Hardening / v0.9*
 # Project Overrides
 

@@ -1,17 +1,23 @@
 {
   "permissions": {
     "allow": [
-      "Bash(wrangler:*)",
       "Bash(wrangler dev:*)",
-      "Bash(wrangler deploy:*)",
       "Bash(wrangler secret:*)",
       "Bash(wrangler tail:*)",
+      "Bash(wrangler types:*)",
+      "Bash(wrangler d1:*)",
+      "Bash(wrangler kv:*)",
+      "Bash(wrangler r2:*)",
       "Bash(npm:*)",
       "Bash(npx:*)",
       "Bash(pnpm:*)",
       "Bash(node:*)",
       "Bash(vite:*)",
       "Bash(terraform:*)"
+    ],
+    "deny": [
+      "Bash(wrangler deploy:*)",
+      "Bash(wrangler publish:*)"
     ]
   },
   "env": {

@@ -6,8 +6,10 @@ Quick reference for TOB Claude development.
 
 | Document | Description |
 |----------|-------------|
+| [Onboarding](ONBOARDING.md) | New developer setup (CLAUDE_ENV_FILE, credentials) |
+| [Tech Stack](TECH_STACK.md) | RedwoodSDK, Cloudflare, frameworks explained |
 | [First Deploy](FIRST_DEPLOY.md) | Step-by-step Cloudflare Workers deployment |
-| [Secrets Management](SECRETS.md) | How to handle secrets across environments |
+| [Secrets Management](SECRETS.md) | Four-layer secret management system |
 
 ## Product OS
 
@@ -56,6 +58,7 @@ Quick reference for TOB Claude development.
 | `shared/ci/` | CI/CD workflow templates |
 | `shared/pwa/` | PWA manifest and config |
 | `shared/email/` | Resend email templates |
+| `shared/scripts/` | Preflight checks, utilities |
 
 ## Quick Commands
 

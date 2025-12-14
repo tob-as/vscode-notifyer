@@ -2,13 +2,65 @@
 
 How to handle secrets across local development, CI/CD, and production.
 
-## The Three Environments
+## The Four Layers
 
-| Environment | Secret Storage | Access Method |
-|-------------|----------------|---------------|
+| Layer | Secret Storage | Access Method |
+|-------|----------------|---------------|
+| Developer Global | `~/.tob/env-setup.sh` | `CLAUDE_ENV_FILE` (Claude Code sessions) |
 | Local Dev | `.dev.vars` file | `wrangler dev` reads automatically |
 | CI/CD | GitHub Secrets | Injected as environment variables |
 | Production | Cloudflare Secrets | `wrangler secret put` |
+
+---
+
+## Developer Global Secrets (NEW)
+
+### Purpose
+
+Personal credentials that persist across ALL Claude Code sessions and projects.
+
+### Setup
+
+1. Create `~/.tob/env-setup.sh`:
+   ```bash
+   #!/bin/bash
+   # TOB Global Secrets (lokal, NICHT committen)
+
+   export CLOUDFLARE_ACCOUNT_ID="your-account-id"
+   export CLOUDFLARE_API_TOKEN="your-api-token"
+   export RESEND_API_KEY="re_xxxxx"
+   ```
+
+2. Make executable:
+   ```bash
+   chmod +x ~/.tob/env-setup.sh
+   ```
+
+3. Add to shell config (`~/.bashrc` or `~/.zshrc`):
+   ```bash
+   export CLAUDE_ENV_FILE=~/.tob/env-setup.sh
+   ```
+
+4. Reload terminal:
+   ```bash
+   source ~/.bashrc
+   ```
+
+### Benefits
+
+- Secrets available in EVERY Claude Code session
+- No repeated "paste your API key" prompts
+- Centralized credential management
+- Never committed to any repo
+
+### Getting Credentials
+
+See [ONBOARDING.md](ONBOARDING.md) for how to obtain:
+- Cloudflare API Token
+- Resend API Key
+- Other service credentials
+
+---
 
 ## Local Development
 

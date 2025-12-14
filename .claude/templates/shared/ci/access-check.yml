@@ -1,0 +1,70 @@
+# Access Policy Check Workflow
+# Copy to: .github/workflows/access-check.yml
+#
+# Verifies Zero Trust configuration before deployment
+# Prevents accidental public exposure
+
+name: Access Policy Check
+
+on:
+  push:
+    branches: [main, staging]
+  pull_request:
+    branches: [main, staging]
+
+jobs:
+  check-access:
+    name: Verify Zero Trust Access
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check Access Policy exists
+        run: |
+          if [ ! -f "infra/cloudflare-access/main.tf" ]; then
+            echo "❌ SECURITY: Missing Cloudflare Access configuration"
+            echo ""
+            echo "All internal apps MUST have Zero Trust Access configured."
+            echo "Expected file: infra/cloudflare-access/main.tf"
+            echo ""
+            echo "See: docs/SECURITY.md"
+            exit 1
+          fi
+          echo "✓ Access Policy found"
+
+      - name: Check workers_dev is disabled
+        run: |
+          if [ -f "wrangler.toml" ]; then
+            if grep -q "workers_dev.*=.*true" wrangler.toml; then
+              echo "❌ SECURITY: workers_dev=true creates public URLs"
+              echo ""
+              echo "Internal apps must set: workers_dev = false"
+              echo "This prevents *.workers.dev public exposure"
+              echo ""
+              echo "Fix: Set workers_dev = false in wrangler.toml"
+              exit 1
+            fi
+            echo "✓ workers_dev check passed"
+          fi
+
+      - name: Check app-config visibility
+        run: |
+          if [ -f ".github/app-config.yml" ]; then
+            if grep -q 'visibility:.*"public"' .github/app-config.yml; then
+              echo "❌ SECURITY: Public visibility requires security review"
+              echo ""
+              echo "Internal apps must have: visibility: internal"
+              echo "Changing to public requires explicit approval"
+              echo ""
+              exit 1
+            fi
+            echo "✓ Visibility check passed"
+          fi
+
+      - name: Summary
+        run: |
+          echo "✓ Zero Trust Access verification passed"
+          echo "  - Access Policy configured"
+          echo "  - workers_dev disabled"
+          echo "  - Visibility set to internal"

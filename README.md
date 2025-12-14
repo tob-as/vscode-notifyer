@@ -11,7 +11,9 @@ Meta-repository for KI-assisted development of **Serverless applications on Clou
 /sprint-plan        # Plan sprint
 ```
 
-That's it. Redwood. No alternatives.
+That's it. **RedwoodSDK** (Cloudflare-native React framework). No alternatives.
+
+> **Note:** We use [RedwoodSDK](https://docs.rwsdk.com/) (rwsdk 1.x), NOT Redwood GraphQL. See [TECH_STACK.md](docs/TECH_STACK.md) for clarification.
 
 ### API-Only Projects
 
@@ -50,6 +52,8 @@ Commands chain automatically: `/intake` → `/breakdown` → `/sprint-plan` → 
 See [docs/INDEX.md](docs/INDEX.md) for complete documentation index.
 
 Key guides:
+- [Onboarding](docs/ONBOARDING.md) - New developer setup
+- [Tech Stack](docs/TECH_STACK.md) - RedwoodSDK, Cloudflare, tooling
 - [Product OS](docs/PRODUCT_OS.md) - End-to-end process overview
 - [First Deploy](docs/FIRST_DEPLOY.md) - Cloudflare Workers deployment
 - [Testing Guide](docs/TESTING.md) - Vitest setup and patterns
@@ -85,12 +89,13 @@ Key guides:
 
 ## Status
 
-**Phase:** Wave 9 (Profile Simplification)
-**Version:** 0.8
+**Phase:** Wave 10 (Engineering OS - Security Hardening)
+**Version:** 0.9
 
-Wave 9 changes:
-- **Auto-Detection:** `setup-claude.sh` detects profile from project files
-- **All Skills Available:** Skills are always symlinked, Claude chooses what to use
-- **All Commands Available:** Commands are always symlinked
-- **Simplified Profiles:** Profile only controls Scope Lock (write permissions)
-- **Removed Obsolete Files:** end-user.json, developer.json, microtool.json deleted
+Wave 10 changes:
+- **Smart Permissions:** Auto-approve hook for git/npm/mkdir (no prompts)
+- **Deployment Security:** wrangler deploy blocked locally, CI-only
+- **Secret Management:** CLAUDE_ENV_FILE for persistent developer secrets
+- **Preflight Checks:** Automatic secret validation before dev
+- **Zero Trust Hardening:** workers_dev=false, Access-check in CI
+- **Tech Stack Docs:** RedwoodSDK vs Redwood GraphQL clarified

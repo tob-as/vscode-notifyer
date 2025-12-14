@@ -14,6 +14,18 @@
       "setup-claude.sh",
       "install.sh",
       "package.json"
+    ],
+    "deny": [
+      "Read(.env)",
+      "Read(.dev.vars)",
+      "Read(**/.env)",
+      "Read(**/.dev.vars)",
+      "Read(secrets/**)",
+      "Edit(.env)",
+      "Edit(.dev.vars)",
+      "Write(.env)",
+      "Write(.dev.vars)",
+      "Write(secrets/**)"
     ]
   }
 }
