@@ -89,3 +89,57 @@ jobs:
 
           LOCAL_VERSION=$(grep "version:" .claude/setup-version.yml | cut -d: -f2 | tr -d ' "')
           echo "✓ Setup version: $LOCAL_VERSION"
+
+      # 6. ZERO TRUST GATE
+      - name: Verify Access Protection (internal apps)
+        run: |
+          VISIBILITY=$(grep "visibility:" .github/app-config.yml | cut -d: -f2 | tr -d ' ')
+          if [ "$VISIBILITY" = "internal" ]; then
+            # Check Terraform config exists
+            if [ ! -f "infra/cloudflare-access/main.tf" ]; then
+              echo "::error::Internal app requires Access protection"
+              echo "Missing: infra/cloudflare-access/main.tf"
+              exit 1
+            fi
+            # Check Access Application resource exists
+            if ! grep -q "cloudflare_zero_trust_access_application\|cloudflare_access_application" infra/cloudflare-access/main.tf; then
+              echo "::error::No Access Application defined in Terraform"
+              exit 1
+            fi
+          fi
+          echo "✓ Zero Trust check passed"
+
+      # 7. VISIBILITY CHANGE AUDIT
+      - name: Check visibility change requires approval
+        if: github.event_name == 'pull_request'
+        run: |
+          # Check if visibility changed from internal to public
+          if git diff origin/main -- .github/app-config.yml 2>/dev/null | grep -E "^\+.*visibility.*public"; then
+            echo "::error::Visibility change to 'public' requires security-review label"
+            echo "Add label 'security-review-approved' to proceed"
+            exit 1
+          fi
+          echo "✓ No visibility regression"
+
+      # 8. REDWOOD CONTRACT
+      - name: Verify project structure
+        run: |
+          # Check for UI project (has worker.tsx)
+          if [ -f "src/worker.tsx" ]; then
+            # UI projects must use Redwood SDK
+            if [ -f "package.json" ]; then
+              if ! grep -q '"rwsdk"\|"@redwoodjs/' package.json; then
+                echo "::error::UI projects must use Redwood SDK"
+                exit 1
+              fi
+            fi
+            # Redwood projects need vite.config
+            if [ ! -f "vite.config.ts" ]; then
+              echo "::error::Redwood project missing vite.config.ts"
+              exit 1
+            fi
+            echo "✓ Redwood project structure valid"
+          else
+            # Serverless Worker (no UI) - allowed
+            echo "✓ Serverless Worker (no UI requirement)"
+          fi
