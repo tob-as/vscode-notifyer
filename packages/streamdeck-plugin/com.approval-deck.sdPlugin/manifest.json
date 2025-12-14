@@ -1,0 +1,83 @@
+{
+	"UUID": "com.approval-deck",
+	"Author": "Approval Deck",
+	"Name": "Approval Deck",
+	"Version": "1.1.0.0",
+	"Description": "Monitor Claude Code approval prompts and focus VS Code notifications",
+	"Category": "Development",
+	"CategoryIcon": "images/category-icon",
+	"Icon": "images/plugin-icon",
+	"URL": "https://github.com/approval-deck",
+	"SDKVersion": 2,
+	"OS": [
+		{
+			"Platform": "mac",
+			"MinimumVersion": "10.15"
+		},
+		{
+			"Platform": "windows",
+			"MinimumVersion": "10"
+		}
+	],
+	"Software": {
+		"MinimumVersion": "6.4"
+	},
+	"Nodejs": {
+		"Version": "20",
+		"Debug": "enabled"
+	},
+	"CodePath": "bin/plugin.js",
+	"Actions": [
+		{
+			"UUID": "com.approval-deck.monitor",
+			"Name": "Approval Monitor",
+			"Icon": "images/action-monitor",
+			"Tooltip": "Monitor Claude Code approvals for a single project",
+			"Controllers": [
+				"Keypad"
+			],
+			"States": [
+				{
+					"Image": "images/key-default",
+					"TitleAlignment": "middle",
+					"FontSize": 12
+				}
+			],
+			"PropertyInspectorPath": "pi/monitor.html"
+		},
+		{
+			"UUID": "com.approval-deck.summary",
+			"Name": "Approval Summary",
+			"Icon": "images/action-summary",
+			"Tooltip": "Summary of all project approvals",
+			"Controllers": [
+				"Keypad"
+			],
+			"States": [
+				{
+					"Image": "images/key-default",
+					"TitleAlignment": "middle",
+					"FontSize": 12
+				}
+			],
+			"PropertyInspectorPath": "pi/summary.html"
+		},
+		{
+			"UUID": "com.approval-deck.auto-monitor",
+			"Name": "Auto Monitor (Slot)",
+			"Icon": "images/action-auto",
+			"Tooltip": "Automatically monitors project by slot number (1-15)",
+			"Controllers": [
+				"Keypad"
+			],
+			"States": [
+				{
+					"Image": "images/key-default",
+					"TitleAlignment": "middle",
+					"FontSize": 12
+				}
+			],
+			"PropertyInspectorPath": "pi/auto-monitor.html"
+		}
+	]
+}

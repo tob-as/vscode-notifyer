@@ -1,0 +1,24 @@
+{
+  "name": "approval-deck-dashboard",
+  "version": "1.2.0",
+  "description": "Web dashboard for Approval Deck - view and respond to Claude Code approval requests",
+  "private": true,
+  "type": "module",
+  "main": "dist/server.js",
+  "bin": {
+    "approval-dashboard": "./dist/server.js"
+  },
+  "scripts": {
+    "build": "tsc && cp src/index.html dist/",
+    "build:prod": "tsc && cp src/index.html dist/",
+    "start": "node dist/server.js",
+    "dev": "tsc --watch"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

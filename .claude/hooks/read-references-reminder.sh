@@ -1,0 +1,1 @@
+/home/coder/workspace/tob-claude-internal/.claude/hooks/read-references-reminder.sh

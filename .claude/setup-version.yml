@@ -1,0 +1,5 @@
+version: "2.0.0"
+profile: "base"
+setup_date: "2025-12-14"
+tob_claude_commit: "96d2607"
+auto_detected: true

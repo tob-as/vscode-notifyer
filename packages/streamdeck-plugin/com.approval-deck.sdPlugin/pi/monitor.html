@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Approval Monitor Settings</title>
+  <link rel="stylesheet" href="https://sdpi-components.dev/releases/v3/sdpi-components.css" />
+  <script src="https://sdpi-components.dev/releases/v3/sdpi-components.js"></script>
+  <style>
+    .sdpi-wrapper {
+      margin-top: 8px;
+    }
+    .sdpi-item-label {
+      font-weight: 500;
+    }
+    .sdpi-item-value {
+      flex: 1;
+    }
+    input[type="text"], input[type="number"] {
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .hint {
+      font-size: 11px;
+      color: #888;
+      margin-top: 4px;
+    }
+    hr {
+      border: 0;
+      border-top: 1px solid #444;
+      margin: 16px 0;
+    }
+    h2 {
+      font-size: 13px;
+      font-weight: 600;
+      margin: 16px 0 8px 0;
+      color: #ccc;
+    }
+  </style>
+</head>
+<body>
+  <sdpi-wrapper>
+    <h2>Connection</h2>
+
+    <sdpi-item label="Shared Directory">
+      <sdpi-textfield
+        setting="sharedDirHost"
+        placeholder="C:\Users\me\approval-deck"
+      ></sdpi-textfield>
+      <div class="hint">Host path to shared mount directory</div>
+    </sdpi-item>
+
+    <sdpi-item label="Project ID">
+      <sdpi-textfield
+        setting="projectId"
+        placeholder="my-project"
+      ></sdpi-textfield>
+      <div class="hint">Must match approvalDeck.projectId in VS Code</div>
+    </sdpi-item>
+
+    <hr />
+    <h2>Display</h2>
+
+    <sdpi-item label="Label Override">
+      <sdpi-textfield
+        setting="projectLabelOverride"
+        placeholder="(use project label)"
+      ></sdpi-textfield>
+      <div class="hint">Override display label on key</div>
+    </sdpi-item>
+
+    <sdpi-item label="Blink Interval">
+      <sdpi-textfield
+        setting="blinkIntervalMs"
+        type="number"
+        default="500"
+        min="100"
+        max="2000"
+      ></sdpi-textfield>
+      <div class="hint">Blink speed in milliseconds (100-2000)</div>
+    </sdpi-item>
+
+    <hr />
+    <h2>Sound</h2>
+
+    <sdpi-item label="Enable Sound">
+      <sdpi-checkbox setting="enableSound" default="true"></sdpi-checkbox>
+    </sdpi-item>
+
+    <sdpi-item label="Sound Cooldown">
+      <sdpi-textfield
+        setting="soundCooldownMs"
+        type="number"
+        default="1500"
+        min="0"
+        max="10000"
+      ></sdpi-textfield>
+      <div class="hint">Minimum time between sounds (ms)</div>
+    </sdpi-item>
+  </sdpi-wrapper>
+</body>
+</html>

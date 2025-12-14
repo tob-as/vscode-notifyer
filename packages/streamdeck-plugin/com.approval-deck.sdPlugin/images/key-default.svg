@@ -1,0 +1,6 @@
+<svg width="144" height="144" xmlns="http://www.w3.org/2000/svg">
+  <rect width="144" height="144" fill="#333333"/>
+  <text x="72" y="50" text-anchor="middle" fill="#888888" font-size="14" font-family="Arial">Configure</text>
+  <text x="72" y="75" text-anchor="middle" fill="#888888" font-size="14" font-family="Arial">in Property</text>
+  <text x="72" y="100" text-anchor="middle" fill="#888888" font-size="14" font-family="Arial">Inspector</text>
+</svg>

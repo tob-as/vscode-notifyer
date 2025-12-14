@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./com.approval-deck.sdPlugin/bin",
+    "rootDir": "./com.approval-deck.sdPlugin/src",
+    "module": "Node16",
+    "moduleResolution": "Node16",
+    "target": "ES2022",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
+  },
+  "include": ["com.approval-deck.sdPlugin/src/**/*"],
+  "exclude": ["node_modules"]
+}

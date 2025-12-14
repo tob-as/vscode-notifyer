@@ -1,0 +1,1 @@
+/home/coder/workspace/tob-claude-setup/.claude/commands/switch-profile.md

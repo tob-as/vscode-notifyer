@@ -1,0 +1,99 @@
+{
+  "name": "approval-deck",
+  "displayName": "Approval Deck",
+  "description": "Stream Deck and Dashboard integration for Claude Code approval notifications",
+  "version": "1.2.0",
+  "publisher": "approval-deck",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "claude",
+    "stream deck",
+    "notifications",
+    "approval"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "configuration": {
+      "title": "Approval Deck",
+      "properties": {
+        "approvalDeck.sharedDir": {
+          "type": "string",
+          "default": "/shared/approval-deck",
+          "description": "Path to shared directory for state/commands communication with Stream Deck"
+        },
+        "approvalDeck.projectId": {
+          "type": "string",
+          "default": "",
+          "description": "Unique project identifier (defaults to workspace folder name)"
+        },
+        "approvalDeck.projectLabel": {
+          "type": "string",
+          "default": "",
+          "description": "Display label for this project (defaults to projectId)"
+        },
+        "approvalDeck.idleThresholdSec": {
+          "type": "number",
+          "default": 120,
+          "minimum": 10,
+          "description": "Seconds of inactivity before switching to idle mode"
+        },
+        "approvalDeck.enableDebugLog": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable debug logging to shared/logs directory"
+        },
+        "approvalDeck.commandPollIntervalMs": {
+          "type": "number",
+          "default": 250,
+          "minimum": 100,
+          "maximum": 2000,
+          "description": "Interval in ms to poll for Stream Deck commands"
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "approvalDeck.showStatus",
+        "title": "Approval Deck: Show Status"
+      },
+      {
+        "command": "approvalDeck.focusApprovals",
+        "title": "Approval Deck: Focus Approvals"
+      },
+      {
+        "command": "approvalDeck.simulateApproval",
+        "title": "Approval Deck: Simulate Approval (Debug)"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile -- --production",
+    "compile": "node esbuild.js",
+    "watch": "node esbuild.js --watch",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js",
+    "package": "vsce package --allow-missing-repository --no-dependencies"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/uuid": "^9.0.0",
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.0",
+    "@typescript-eslint/parser": "^6.13.0",
+    "esbuild": "^0.20.0",
+    "eslint": "^8.55.0",
+    "typescript": "^5.3.3",
+    "@vscode/vsce": "^2.22.0"
+  },
+  "dependencies": {
+    "uuid": "^9.0.0"
+  }
+}

@@ -1,0 +1,15 @@
+<svg width="20" height="20" xmlns="http://www.w3.org/2000/svg">
+  <rect width="20" height="20" fill="transparent"/>
+  <!-- Grid pattern representing slots -->
+  <rect x="2" y="2" width="5" height="5" rx="1" fill="#4a4a4a" stroke="#888" stroke-width="0.5"/>
+  <rect x="8" y="2" width="5" height="5" rx="1" fill="#4a4a4a" stroke="#888" stroke-width="0.5"/>
+  <rect x="14" y="2" width="4" height="5" rx="1" fill="#4a4a4a" stroke="#888" stroke-width="0.5"/>
+  <rect x="2" y="8" width="5" height="5" rx="1" fill="#e94560" stroke="#888" stroke-width="0.5"/>
+  <rect x="8" y="8" width="5" height="5" rx="1" fill="#4a4a4a" stroke="#888" stroke-width="0.5"/>
+  <rect x="14" y="8" width="4" height="5" rx="1" fill="#4a4a4a" stroke="#888" stroke-width="0.5"/>
+  <rect x="2" y="14" width="5" height="4" rx="1" fill="#4a4a4a" stroke="#888" stroke-width="0.5"/>
+  <rect x="8" y="14" width="5" height="4" rx="1" fill="#4a4a4a" stroke="#888" stroke-width="0.5"/>
+  <rect x="14" y="14" width="4" height="4" rx="1" fill="#4a4a4a" stroke="#888" stroke-width="0.5"/>
+  <!-- Auto indicator -->
+  <text x="4" y="12" font-size="5" fill="#fff" font-weight="bold">A</text>
+</svg>

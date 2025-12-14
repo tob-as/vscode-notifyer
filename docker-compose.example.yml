@@ -1,0 +1,52 @@
+# Example docker-compose.yml for Approval Deck
+#
+# This shows how to set up the shared volume mount between
+# your VS Code Server container and the host where Stream Deck runs.
+
+version: '3.8'
+
+services:
+  vscode:
+    image: codercom/code-server:latest  # Or your VS Code Server image
+
+    volumes:
+      # Your project code
+      - ./workspace:/home/coder/workspace
+
+      # Approval Deck shared directory
+      # Left side: HOST path (where Stream Deck can read)
+      # Right side: CONTAINER path (what VS Code extension uses)
+      - ./approval-deck:/shared/approval-deck
+
+      # Alternative paths:
+      # Windows: C:\Users\yourname\approval-deck:/shared/approval-deck
+      # macOS:   /Users/yourname/approval-deck:/shared/approval-deck
+
+    environment:
+      # Optional: Pre-configure VS Code settings
+      - VSCODE_SETTINGS_JSON={"approvalDeck.sharedDir":"/shared/approval-deck","approvalDeck.projectId":"my-project"}
+
+    ports:
+      - "8443:8443"
+
+    # Ensure the shared directory is writable
+    user: "1000:1000"
+
+# Directory structure after setup:
+#
+# Host machine:
+#   ./approval-deck/
+#   ├── state/
+#   │   └── my-project.json      <- Written by VS Code extension
+#   ├── commands/
+#   │   └── my-project.ndjson    <- Written by Stream Deck plugin
+#   └── logs/
+#       └── my-project.ndjson    <- Optional debug logs
+#
+# Configure Stream Deck with:
+#   Shared Directory: /full/path/to/approval-deck  (absolute HOST path)
+#   Project ID: my-project
+#
+# Configure VS Code extension with:
+#   approvalDeck.sharedDir: /shared/approval-deck  (CONTAINER path)
+#   approvalDeck.projectId: my-project

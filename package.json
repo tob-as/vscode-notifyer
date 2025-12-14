@@ -1,0 +1,30 @@
+{
+  "name": "approval-deck-monorepo",
+  "version": "1.2.0",
+  "private": true,
+  "description": "VS Code Extension + Stream Deck Plugin + Dashboard for Claude Code Approval Notifications",
+  "workspaces": [
+    "packages/vscode-extension",
+    "packages/streamdeck-plugin",
+    "packages/dashboard-server"
+  ],
+  "scripts": {
+    "build": "npm run build:vscode && npm run build:streamdeck && npm run build:dashboard",
+    "build:vscode": "npm run compile -w packages/vscode-extension",
+    "build:streamdeck": "npm run build -w packages/streamdeck-plugin",
+    "build:dashboard": "npm run build -w packages/dashboard-server",
+    "watch:vscode": "npm run watch -w packages/vscode-extension",
+    "start:dashboard": "npm run start -w packages/dashboard-server",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "package:vscode": "npm run package -w packages/vscode-extension",
+    "package:streamdeck": "npm run pack -w packages/streamdeck-plugin",
+    "release": "node scripts/release.js"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
