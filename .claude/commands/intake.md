@@ -6,7 +6,17 @@ Transform a business use case into a structured PRD (Product Requirements Docume
 
 ```
 /intake [use case description]
+/intake --auto [use case description]   # Auto-chain to /breakdown
 ```
+
+## Orchestration
+
+When `--auto` flag is provided, after completing this command:
+1. Create the PRD
+2. Create the GitHub Issue
+3. **Automatically invoke `/breakdown`** with the PRD path
+
+This enables the full autonomous workflow: `/intake --auto` triggers the entire chain through `/retro`.
 
 ## Process
 

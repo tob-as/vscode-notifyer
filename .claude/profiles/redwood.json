@@ -1,16 +1,10 @@
 {
+  "scope": "redwood",
   "instructions": [
     "workflow.md",
-    "redwoodsdk.md",
     "code-quality.md",
     "git-workflow.md",
-    "conflict-handling.md"
-  ],
-  "commands": ["design.md", "build.md", "create.md"],
-  "skills": [
-    "redwoodsdk-patterns",
-    "shared/react-patterns",
-    "shared/tailwind-patterns",
-    "git/branching.md"
+    "conflict-handling.md",
+    "mobile-first.md"
   ]
 }

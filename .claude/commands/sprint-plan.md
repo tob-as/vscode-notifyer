@@ -6,9 +6,20 @@ Select and commit to stories for the upcoming sprint.
 
 ```
 /sprint-plan [capacity]
+/sprint-plan --auto [capacity]   # Auto-chain to /release after sprint
 ```
 
 Where capacity is optional team availability (e.g., "3 devs, 2 weeks").
+
+## Orchestration
+
+When `--auto` flag is provided (or inherited from chain):
+1. Create sprint plan
+2. Execute the sprint (implement stories)
+3. When sprint is complete, **automatically invoke `/release`**
+4. Then chain to `/retro`
+
+**Sprint Completion Detection:** The agent monitors story completion. When all committed stories are done (or sprint time ends), it triggers the next phase.
 
 ## Process
 

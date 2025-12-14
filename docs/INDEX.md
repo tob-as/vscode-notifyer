@@ -9,19 +9,32 @@ Quick reference for TOB Claude development.
 | [First Deploy](FIRST_DEPLOY.md) | Step-by-step Cloudflare Workers deployment |
 | [Secrets Management](SECRETS.md) | How to handle secrets across environments |
 
+## Product OS
+
+| Document | Description |
+|----------|-------------|
+| [Product OS](PRODUCT_OS.md) | End-to-end process overview |
+| [Versioning](VERSIONING.md) | SemVer guidelines |
+| [Release Process](RELEASE_PROCESS.md) | Branch strategy and release flow |
+| [Commits](COMMITS.md) | Conventional commits standard |
+| [Labels](LABELS.md) | GitHub label system |
+
 ## Development
 
 | Document | Description |
 |----------|-------------|
 | [Testing Guide](TESTING.md) | Vitest setup and testing patterns |
+| [E2E Testing](E2E_TESTING.md) | Playwright with CF Access |
+| [PWA](PWA.md) | Progressive Web App setup |
+| [Email](EMAIL.md) | Resend email integration |
 | [Cross-Skill Interaction](cross-skill-interaction.md) | How skills work together |
 
-## Security
+## CI/CD
 
 | Document | Description |
 |----------|-------------|
-| [Security Policy](SECURITY.md) | Zero Trust requirements and policies |
-| [Authentication Standard](../.claude/instructions/auth-standard.md) | Cloudflare Access integration |
+| [CI/CD Pipeline](CI_CD.md) | Quality gates and deployment |
+| [Security](SECURITY.md) | Zero Trust, scanning, scope lock |
 
 ## Architecture
 
@@ -37,24 +50,29 @@ Quick reference for TOB Claude development.
 |----------|----------|
 | `serverless/` | API-only Cloudflare Workers |
 | `redwood/` | Full-stack apps with UI (RedwoodSDK) |
-
-## Profiles
-
-| Profile | Description |
-|---------|-------------|
-| `end-user` | Non-developers building apps |
-| `serverless` | API developers (no UI) |
-| `redwood` | Full-stack developers (UI + API) |
+| `shared/quality/` | ESLint, Prettier, TypeScript configs |
+| `shared/testing/` | Vitest, Playwright configs |
+| `shared/security/` | Dependabot, CodeQL, npm audit |
+| `shared/ci/` | CI/CD workflow templates |
+| `shared/pwa/` | PWA manifest and config |
+| `shared/email/` | Resend email templates |
 
 ## Quick Commands
 
 ```bash
-# Setup new project
+# Create new project
 /create <project-name>
+/create <name> --api-only   # API only, no UI
 
-# Design then build
-/design
-/build
+# Product OS workflow
+/intake                     # Business idea → PRD
+/breakdown                  # PRD → User Stories
+/sprint-plan                # Plan sprint
+/release                    # Version bump + Changelog
+/retro                      # Sprint retrospective
+
+# Automatic chaining
+/intake --auto              # Runs full workflow
 
 # Sync from upstream
 /update

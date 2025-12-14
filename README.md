@@ -5,9 +5,10 @@ Meta-repository for KI-assisted development of **Serverless applications on Clou
 ## Quick Start
 
 ```bash
-/create my-app
-/design
-/build
+/create my-app      # Create new project
+/intake             # Define business use case → PRD
+/breakdown          # PRD → User Stories
+/sprint-plan        # Plan sprint
 ```
 
 That's it. Redwood. No alternatives.
@@ -22,28 +23,27 @@ That's it. Redwood. No alternatives.
 
 ```bash
 cd ~/workspace/repos/my-project
-setup-claude.sh redwood     # Full-stack with UI (default)
-setup-claude.sh serverless  # API-only (no UI)
+setup-claude.sh              # Auto-detects profile from project files
 ```
 
-## Core Commands
+Auto-detection:
+- Has `@redwoodjs/sdk` in package.json → **redwood** profile
+- Has `wrangler.toml` → **serverless** profile
+- Otherwise → **base** profile
+
+## Commands
 
 | Command | Description |
 |---------|-------------|
 | `/create <name>` | Create new GitHub repo with template |
-| `/design` | Design phase - create spec, no code |
-| `/build` | Build phase - execute spec |
 | `/update` | Sync from upstream templates |
-
-### Product Commands
-
-| Command | Description |
-|---------|-------------|
 | `/intake` | Business use case to PRD |
 | `/breakdown` | PRD to user stories (INVEST) |
 | `/sprint-plan` | Sprint planning with WIP limits |
 | `/release` | SemVer release with changelog |
 | `/retro` | Sprint retrospective |
+
+Commands chain automatically: `/intake` → `/breakdown` → `/sprint-plan` → `/release` → `/retro`
 
 ## Documentation
 
@@ -53,15 +53,18 @@ Key guides:
 - [Product OS](docs/PRODUCT_OS.md) - End-to-end process overview
 - [First Deploy](docs/FIRST_DEPLOY.md) - Cloudflare Workers deployment
 - [Testing Guide](docs/TESTING.md) - Vitest setup and patterns
+- [E2E Testing](docs/E2E_TESTING.md) - Playwright with CF Access
 - [Security Policy](docs/SECURITY.md) - Zero Trust requirements
-- [Versioning](docs/VERSIONING.md) - SemVer guidelines
-- [Release Process](docs/RELEASE_PROCESS.md) - Branch strategy
+- [CI/CD Pipeline](docs/CI_CD.md) - Quality gates and deployment
+- [Email](docs/EMAIL.md) - Resend integration
+- [PWA](docs/PWA.md) - Progressive Web App setup
+- [Secrets](docs/SECRETS.md) - Secret management across environments
 
 ## Architecture
 
 ```
 .claude/
-├── commands/       # Slash commands (/design, /build, etc.)
+├── commands/       # Slash commands (/create, /intake, etc.)
 ├── agents/         # Specialized agent configurations
 ├── skills/         # Reusable coding patterns
 ├── settings/       # Permissions, hooks, model selection
@@ -82,12 +85,12 @@ Key guides:
 
 ## Status
 
-**Phase:** Wave 7 (Product OS)
-**Version:** 0.6
+**Phase:** Wave 9 (Profile Simplification)
+**Version:** 0.8
 
-Wave 7 changes:
-- Product Operating System: /intake → /breakdown → /sprint-plan → /release → /retro
-- 7 new agents: product-owner, researcher, sprint-planner, qa-tester, release-manager, docs-keeper, retro-facilitator
-- GitHub Issue Forms (feature, story, bug, security, retro-improvement)
-- Release Drafter automation
-- SemVer and Conventional Commits documentation
+Wave 9 changes:
+- **Auto-Detection:** `setup-claude.sh` detects profile from project files
+- **All Skills Available:** Skills are always symlinked, Claude chooses what to use
+- **All Commands Available:** Commands are always symlinked
+- **Simplified Profiles:** Profile only controls Scope Lock (write permissions)
+- **Removed Obsolete Files:** end-user.json, developer.json, microtool.json deleted

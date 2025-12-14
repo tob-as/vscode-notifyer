@@ -1,32 +1,41 @@
 #!/bin/bash
-# setup-claude.sh - Initialize or switch TOB Claude config in any project
-# Usage: setup-claude.sh [profile] [options]
+# setup-claude.sh - Initialize TOB Claude config in any project
+# Usage: setup-claude.sh [profile]
 #
-# Profiles (Cloudflare-focused):
-#   end-user   - For non-developers building apps (default)
-#   serverless - For Cloudflare Workers (pure API/Worker)
-#   redwood    - For RedwoodSDK fullstack apps (SSR, RSC)
-#   microtool  - For React + Hono microtools (monorepo)
-#
-# Serverless options:
-#   --type=ui|api     Worker type (default: ui)
-#   --with-kv         Add KV storage
-#   --with-d1         Add D1 database
-#   --with-auth       Add user authentication (workers-users)
+# If no profile is specified, auto-detects based on project files:
+#   - package.json with @redwoodjs/sdk → redwood
+#   - wrangler.toml (without Redwood) → serverless
+#   - otherwise → base
 #
 # Examples:
-#   setup-claude.sh serverless
-#   setup-claude.sh serverless --type=api
-#   setup-claude.sh serverless --with-d1 --with-auth
-#   setup-claude.sh redwood
-#   setup-claude.sh microtool
+#   setup-claude.sh           # Auto-detect profile
+#   setup-claude.sh redwood   # Force redwood profile
+#   setup-claude.sh serverless --with-d1
 
 set -e
 
 # Get the directory where this script lives (= tob-claude-internal root)
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-# Parse arguments
+# ============================================================
+# AUTO-DETECTION
+# ============================================================
+detect_profile() {
+  # 1. Has RedwoodSDK in package.json?
+  if [ -f "package.json" ] && grep -q "@redwoodjs/sdk" package.json 2>/dev/null; then
+    echo "redwood"
+  # 2. Has wrangler.toml but no Redwood?
+  elif [ -f "wrangler.toml" ]; then
+    echo "serverless"
+  # 3. Unknown = base setup
+  else
+    echo "base"
+  fi
+}
+
+# ============================================================
+# PARSE ARGUMENTS
+# ============================================================
 PROFILE=""
 WORKER_TYPE="ui"
 WITH_KV=false
@@ -59,8 +68,13 @@ for arg in "$@"; do
   esac
 done
 
-# Default profile
-PROFILE="${PROFILE:-end-user}"
+# Auto-detect if no profile specified
+if [ -z "$PROFILE" ]; then
+  PROFILE=$(detect_profile)
+  echo "✓ Auto-detected profile: $PROFILE"
+else
+  echo "✓ Using profile: $PROFILE"
+fi
 
 # Check profile exists
 MANIFEST="$SCRIPT_DIR/.claude/profiles/$PROFILE.json"
@@ -82,45 +96,16 @@ if ! command -v jq &> /dev/null; then
   exit 1
 fi
 
-# Validate profile templates exist
-validate_profile_templates() {
-  local profile="$1"
-  local missing=""
-
-  # Check for required template directories per profile
-  case "$profile" in
-    serverless)
-      [ ! -d "$SCRIPT_DIR/.claude/templates/serverless/base" ] && missing="$missing serverless/base"
-      ;;
-    redwood)
-      [ ! -d "$SCRIPT_DIR/.claude/templates/redwood/base" ] && missing="$missing redwood/base"
-      ;;
-    microtool)
-      [ ! -d "$SCRIPT_DIR/.claude/templates/microtool/base" ] && missing="$missing microtool/base"
-      ;;
-  esac
-
-  # Check shared templates (warning only)
-  if [ ! -f "$SCRIPT_DIR/.claude/templates/shared/ci/claude-compliance.yml" ]; then
-    echo "Warning: claude-compliance.yml not found - compliance checks will not be copied"
-  fi
-
-  if [ -n "$missing" ]; then
-    echo "Error: Missing template directories:$missing"
-    echo ""
-    echo "Please ensure tob-claude-internal is up to date:"
-    echo "  cd $SCRIPT_DIR && git pull"
-    exit 1
-  fi
-}
-
-validate_profile_templates "$PROFILE"
-
-# Merge general.json with profile-specific settings and scope settings
+# ============================================================
+# SETTINGS MERGE
+# ============================================================
 merge_settings() {
   local general="$SCRIPT_DIR/.claude/settings/general.json"
   local profile_settings="$SCRIPT_DIR/.claude/settings/$PROFILE.json"
-  local scope_settings="$SCRIPT_DIR/.claude/templates/settings/$PROFILE.settings.json"
+
+  # Get scope from profile manifest
+  local scope=$(jq -r '.scope // "serverless"' "$MANIFEST")
+  local scope_settings="$SCRIPT_DIR/.claude/templates/settings/$scope.settings.json"
 
   # Fallback to serverless scope if profile-specific scope doesn't exist
   if [ ! -f "$scope_settings" ]; then
@@ -148,7 +133,7 @@ merge_settings() {
     ' "$general" "$profile_settings")
   fi
 
-  # Merge scope settings (file path permissions)
+  # Merge scope settings (file path permissions - SCOPE LOCK)
   if [ -f "$scope_settings" ]; then
     result=$(echo "$result" | jq --slurpfile scope "$scope_settings" '
       .permissions.read = ($scope[0].permissions.read // ["**/*"]) |
@@ -159,27 +144,28 @@ merge_settings() {
   echo "$result"
 }
 
-# Convert to ~/ relative path for @ imports
+# ============================================================
+# BUILD IMPORTS
+# ============================================================
 CONFIG_REPO_HOME="~${SCRIPT_DIR#$HOME}"
 
-# Parse manifest
+# Parse instructions from manifest
 INSTRUCTIONS=$(jq -r '.instructions[]' "$MANIFEST" 2>/dev/null)
-COMMANDS=$(jq -r '.commands[]?' "$MANIFEST" 2>/dev/null)
-SKILLS=$(jq -r '.skills[]?' "$MANIFEST" 2>/dev/null)
 
-# Build imports list
+# Build imports list for CLAUDE.md
 IMPORTS=""
 for instr in $INSTRUCTIONS; do
   IMPORTS="$IMPORTS@$CONFIG_REPO_HOME/.claude/instructions/$instr"$'\n'
 done
 
-# Track if this is a fresh setup or a profile switch
+# ============================================================
+# CLAUDE.MD SETUP
+# ============================================================
 IS_NEW_SETUP=false
 if [ ! -f "CLAUDE.md" ]; then
   IS_NEW_SETUP=true
 fi
 
-# Check if CLAUDE.md has standard structure
 has_standard_structure() {
   [ -f "CLAUDE.md" ] && \
   grep -q "^# Team Standards" CLAUDE.md && \
@@ -188,7 +174,6 @@ has_standard_structure() {
 }
 
 if [ "$IS_NEW_SETUP" = true ]; then
-  # Create new CLAUDE.md
   cat > CLAUDE.md << EOF
 # Team Standards
 ${IMPORTS}
@@ -198,43 +183,8 @@ ${IMPORTS}
 
 EOF
 elif ! has_standard_structure; then
-  # CLAUDE.md exists but doesn't have standard structure - refactor it automatically
-  echo "⚠️  CLAUDE.md has non-standard structure - restructuring automatically..."
-  echo ""
-
-  # Check if claude CLI is available
-  if ! command -v claude &> /dev/null; then
-    echo "Error: 'claude' CLI not found"
-    echo ""
-    echo "The Claude CLI is required to refactor non-standard CLAUDE.md files."
-    echo "Install from: https://docs.anthropic.com/claude-code"
-    echo ""
-    echo "Alternatively, manually restructure CLAUDE.md with these sections:"
-    echo "  # Team Standards"
-    echo "  @path/to/instructions..."
-    echo "  # Project-Specific"
-    echo "  # Project Overrides"
-    exit 1
-  fi
-
-  # Create backup
-  cp CLAUDE.md CLAUDE.md.backup
-  echo "✓ Backup created: CLAUDE.md.backup"
-
-  # Invoke Claude to restructure the file
-  echo "✓ Invoking Claude to restructure CLAUDE.md..."
-  cat "$SCRIPT_DIR/.claude/agents/refactor-claude-md.md" | claude
-
-  # Replace the placeholder with actual imports (using awk to handle multiline)
-  if grep -q "\[IMPORTS_PLACEHOLDER\]" CLAUDE.md; then
-    TEMP_FILE=$(mktemp)
-    awk -v imports="$IMPORTS" '{gsub(/\[IMPORTS_PLACEHOLDER\]/, imports)}1' CLAUDE.md > "$TEMP_FILE"
-    mv "$TEMP_FILE" CLAUDE.md
-    echo "✓ Team Standards imports added"
-  else
-    echo "⚠️  Warning: Could not find [IMPORTS_PLACEHOLDER] in restructured CLAUDE.md"
-    echo "   You may need to manually add Team Standards section"
-  fi
+  echo "⚠️  CLAUDE.md has non-standard structure - please restructure manually"
+  echo "   Required sections: # Team Standards, # Project-Specific, # Project Overrides"
 else
   # Update existing CLAUDE.md - preserve project-specific content
   PROJECT_SPECIFIC_CONTENT=""
@@ -257,162 +207,110 @@ $PROJECT_OVERRIDES_CONTENT
 EOF
 fi
 
-# Setup .claude directory
+# ============================================================
+# .CLAUDE DIRECTORY SETUP
+# ============================================================
 mkdir -p .claude/commands .claude/skills .claude/hooks
 
-# Symlink agents and standards directories (used by /build command)
+# Symlink agents directory
 if [ -d "$SCRIPT_DIR/.claude/agents" ]; then
   ln -sfn "$SCRIPT_DIR/.claude/agents" ".claude/agents"
 fi
-if [ -d "$SCRIPT_DIR/.claude/standards" ]; then
-  ln -sfn "$SCRIPT_DIR/.claude/standards" ".claude/standards"
-fi
 
-# Helper function: symlink a file if it doesn't already exist (preserves user files)
-symlink_file() {
+# Helper function: symlink with force (always update)
+symlink_force() {
   local src="$1"
   local dest="$2"
-  if [ ! -e "$dest" ]; then
-    ln -sfn "$src" "$dest"
-  fi
+  ln -sfn "$src" "$dest"
 }
 
-# Symlink hooks (all hooks, profile-independent - settings.json controls which run)
+# Symlink ALL hooks
 for hook in "$SCRIPT_DIR/.claude/hooks/"*; do
   [ -e "$hook" ] || continue
-  symlink_file "$hook" ".claude/hooks/$(basename "$hook")"
+  symlink_force "$hook" ".claude/hooks/$(basename "$hook")"
 done
 
-# Generate merged settings.json (general + profile-specific)
+# Generate merged settings.json (includes SCOPE LOCK)
 merge_settings > .claude/settings.json
 
-# Symlink commands (profile-dependent + always include switch-profile)
-for cmd in $COMMANDS; do
-  [ -n "$cmd" ] && [ "$cmd" != "null" ] && symlink_file "$SCRIPT_DIR/.claude/commands/$cmd" ".claude/commands/$cmd"
-done
-symlink_file "$SCRIPT_DIR/.claude/commands/switch-profile.md" ".claude/commands/switch-profile.md"
+# ============================================================
+# SYMLINK ALL SKILLS (profile-independent)
+# ============================================================
+echo "  Linking skills..."
+for skill in "$SCRIPT_DIR/.claude/skills/"*; do
+  [ -e "$skill" ] || continue
+  skill_name=$(basename "$skill")
 
-# Symlink skills (profile-dependent, supports subdirectories)
-for skill in $SKILLS; do
-  if [ -n "$skill" ] && [ "$skill" != "null" ]; then
-    skill_dir=$(dirname "$skill")
-    mkdir -p ".claude/skills/$skill_dir"
-    symlink_file "$SCRIPT_DIR/.claude/skills/$skill" ".claude/skills/$skill"
-  fi
+  # Skip _legacy folders
+  [[ "$skill_name" == _* ]] && continue
+
+  symlink_force "$skill" ".claude/skills/$skill_name"
 done
 
-# Store active profile
+# ============================================================
+# SYMLINK ALL COMMANDS (profile-independent)
+# ============================================================
+echo "  Linking commands..."
+for cmd in "$SCRIPT_DIR/.claude/commands/"*.md; do
+  [ -f "$cmd" ] || continue
+  cmd_name=$(basename "$cmd")
+  symlink_force "$cmd" ".claude/commands/$cmd_name"
+done
+
+# ============================================================
+# VERSION MARKER
+# ============================================================
 echo "$PROFILE" > .claude/active-profile
 
-# Create version marker for compliance tracking
 cat > .claude/setup-version.yml << EOF
-version: "1.0.0"
+version: "2.0.0"
 profile: "$PROFILE"
 setup_date: "$(date +%Y-%m-%d)"
 tob_claude_commit: "$(cd "$SCRIPT_DIR" && git rev-parse --short HEAD 2>/dev/null || echo 'unknown')"
+auto_detected: $([ -z "$1" ] && echo "true" || echo "false")
 EOF
 
 # ============================================================
-# SERVERLESS PROFILE: Copy templates and setup project
+# SERVERLESS PROFILE: Copy templates
 # ============================================================
 if [ "$PROFILE" = "serverless" ]; then
   TEMPLATE_DIR="$SCRIPT_DIR/.claude/templates/serverless"
   PROJECT_NAME=$(basename "$PWD")
   WORKER_NAME=$(echo "$PROJECT_NAME" | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
-  APP_NAME="$PROJECT_NAME"
 
-  echo ""
-  echo "Setting up Cloudflare Workers project..."
-  echo "  Worker name: $WORKER_NAME"
-  echo "  Type: $WORKER_TYPE"
-
-  # Copy base templates (only if files don't exist)
-  copy_if_missing() {
-    local src="$1"
-    local dest="$2"
-    if [ ! -e "$dest" ]; then
-      mkdir -p "$(dirname "$dest")"
-      cp "$src" "$dest"
-      echo "  ✓ Created: $dest"
-    fi
-  }
-
-  # Copy base templates
   if [ -d "$TEMPLATE_DIR/base" ]; then
-    # Workflows
-    copy_if_missing "$TEMPLATE_DIR/base/.github/workflows/deploy-cloudflare.yml" ".github/workflows/deploy-cloudflare.yml"
-    copy_if_missing "$TEMPLATE_DIR/base/.github/workflows/deploy-cloudflare-access.yml" ".github/workflows/deploy-cloudflare-access.yml"
-    copy_if_missing "$SCRIPT_DIR/.claude/templates/shared/ci/claude-compliance.yml" ".github/workflows/claude-compliance.yml"
-    copy_if_missing "$TEMPLATE_DIR/base/.github/app-config.yml" ".github/app-config.yml"
+    echo ""
+    echo "Setting up Cloudflare Workers project..."
 
-    # Terraform
-    copy_if_missing "$TEMPLATE_DIR/base/infra/cloudflare-access/main.tf" "infra/cloudflare-access/main.tf"
-    copy_if_missing "$TEMPLATE_DIR/base/infra/cloudflare-access/variables.tf" "infra/cloudflare-access/variables.tf"
-
-    # Wrangler config
-    copy_if_missing "$TEMPLATE_DIR/base/wrangler.toml" "wrangler.toml"
-
-    # Docs
-    copy_if_missing "$TEMPLATE_DIR/base/docs/SECURITY.md" "docs/SECURITY.md"
-  fi
-
-  # Copy worker type template
-  WORKER_TEMPLATE_DIR="$TEMPLATE_DIR/worker-$WORKER_TYPE"
-  if [ -d "$WORKER_TEMPLATE_DIR" ]; then
-    copy_if_missing "$WORKER_TEMPLATE_DIR/src/index.js" "src/index.js"
-  else
-    # Fallback to base
-    copy_if_missing "$TEMPLATE_DIR/base/src/index.js" "src/index.js"
-  fi
-
-  # Replace placeholders in all created files
-  replace_placeholders() {
-    local file="$1"
-    if [ -f "$file" ]; then
-      # Use different sed syntax for macOS vs Linux
-      if [[ "$OSTYPE" == "darwin"* ]]; then
-        sed -i '' "s/{{WORKER_NAME}}/$WORKER_NAME/g" "$file" 2>/dev/null || true
-        sed -i '' "s/{{APP_NAME}}/$APP_NAME/g" "$file" 2>/dev/null || true
-      else
-        sed -i "s/{{WORKER_NAME}}/$WORKER_NAME/g" "$file" 2>/dev/null || true
-        sed -i "s/{{APP_NAME}}/$APP_NAME/g" "$file" 2>/dev/null || true
+    copy_if_missing() {
+      local src="$1"
+      local dest="$2"
+      if [ ! -e "$dest" ] && [ -f "$src" ]; then
+        mkdir -p "$(dirname "$dest")"
+        cp "$src" "$dest"
+        echo "  ✓ Created: $dest"
       fi
-    fi
-  }
+    }
 
-  # Replace placeholders in all template files
-  for file in wrangler.toml src/index.js .github/workflows/*.yml infra/cloudflare-access/*.tf docs/SECURITY.md; do
-    replace_placeholders "$file"
-  done
+    # Copy templates
+    copy_if_missing "$TEMPLATE_DIR/base/wrangler.toml" "wrangler.toml"
+    copy_if_missing "$TEMPLATE_DIR/base/.github/workflows/deploy-cloudflare.yml" ".github/workflows/deploy-cloudflare.yml"
+    copy_if_missing "$SCRIPT_DIR/.claude/templates/shared/ci/claude-compliance.yml" ".github/workflows/claude-compliance.yml"
 
-  # Add-ons info
-  if [ "$WITH_KV" = true ]; then
-    echo "  📦 KV storage: Add namespace ID to wrangler.toml"
+    # Replace placeholders
+    for file in wrangler.toml .github/workflows/*.yml; do
+      [ -f "$file" ] && sed -i "s/{{WORKER_NAME}}/$WORKER_NAME/g" "$file" 2>/dev/null || true
+    done
   fi
-  if [ "$WITH_D1" = true ]; then
-    echo "  📦 D1 database: Add database ID to wrangler.toml"
-  fi
-  if [ "$WITH_AUTH" = true ]; then
-    echo "  📦 Auth: See docs for workers-users integration"
-  fi
-
-  echo ""
-  echo "Next steps:"
-  echo "  1. Update infra/cloudflare-access/main.tf with your:"
-  echo "     - Cloudflare subdomain ({{CLOUDFLARE_SUBDOMAIN}})"
-  echo "     - Email domain ({{EMAIL_DOMAIN}})"
-  echo "     - Developer emails for dev environment"
-  echo "  2. Add GitHub secrets:"
-  echo "     - CLOUDFLARE_API_TOKEN"
-  echo "     - CLOUDFLARE_ACCESS_TOKEN"
-  echo "     - CLOUDFLARE_ACCOUNT_ID"
-  echo "  3. Run: wrangler dev"
-  echo ""
 fi
 
-# Different message for init vs switch
+# ============================================================
+# DONE
+# ============================================================
+echo ""
 if [ "$IS_NEW_SETUP" = true ]; then
   echo "✓ TOB Claude config initialized with '$PROFILE' profile"
 else
-  echo "✓ Switched to '$PROFILE' profile"
+  echo "✓ Updated to '$PROFILE' profile"
 fi
+echo "  All skills and commands are now available."

@@ -88,6 +88,56 @@ See [Secrets Management](SECRETS.md) for details.
 - Store secrets in code or config files
 - Skip the Zero Trust gate
 
+---
+
+## Automated Security Scanning
+
+### Dependency Audit (npm audit)
+
+CI runs `npm audit` to detect known vulnerabilities in dependencies.
+
+**Policy:**
+- Production dependencies: Block on `high` or `critical`
+- Development dependencies: Block on `critical` only
+- Daily scheduled scan for continuous monitoring
+
+**Setup:**
+Copy `.claude/templates/shared/security/npm-audit.yml` to your workflow.
+
+### Dependabot
+
+GitHub Dependabot automatically:
+- Scans for vulnerable dependencies
+- Opens PRs to update them
+- Groups minor/patch updates
+
+**Setup:**
+Copy `.claude/templates/shared/security/dependabot.yml` to `.github/dependabot.yml`
+
+### CodeQL
+
+Static analysis for security vulnerabilities and code quality issues.
+
+**Detects:**
+- SQL injection
+- XSS vulnerabilities
+- Insecure API usage
+- Code quality issues
+
+**Policy:**
+- Runs on PRs to `main` and `staging`
+- Weekly scheduled scan
+- Results in GitHub Security tab
+
+**Setup:**
+Copy `.claude/templates/shared/security/codeql.yml` to `.github/workflows/codeql.yml`
+
+### Handling Alerts
+
+1. **True Positive**: Fix immediately, create bug issue if complex
+2. **False Positive**: Dismiss with explanation in GitHub Security tab
+3. **Won't Fix**: Document reason, add to security exceptions list
+
 ## Scope Lock (Write Allowlist)
 
 Jedes Projekt MUSS eine `.claude/settings.json` mit `permissions.write` haben.

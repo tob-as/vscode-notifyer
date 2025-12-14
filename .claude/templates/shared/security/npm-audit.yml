@@ -1,0 +1,76 @@
+# NPM Audit Security Check
+# Copy to: .github/workflows/npm-audit.yml
+#
+# Environment-specific audit levels:
+# - develop: fail on high/critical only
+# - staging: fail on moderate+
+# - main/production: fail on any vulnerability
+
+name: NPM Audit
+
+on:
+  push:
+    branches: [main, staging, develop]
+  pull_request:
+  schedule:
+    # Daily at 6am UTC
+    - cron: '0 6 * * *'
+
+jobs:
+  audit:
+    name: NPM Security Audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Determine audit level
+        id: audit-level
+        run: |
+          BRANCH="${GITHUB_REF_NAME}"
+          if [[ "$BRANCH" == "main" ]]; then
+            # Production: strictest - fail on any vulnerability
+            echo "level=low" >> $GITHUB_OUTPUT
+            echo "description=Production: failing on ANY vulnerability" >> $GITHUB_OUTPUT
+          elif [[ "$BRANCH" == "staging" ]]; then
+            # Staging: strict - fail on moderate+
+            echo "level=moderate" >> $GITHUB_OUTPUT
+            echo "description=Staging: failing on moderate+ vulnerabilities" >> $GITHUB_OUTPUT
+          else
+            # Develop/feature: fail on high/critical only
+            echo "level=high" >> $GITHUB_OUTPUT
+            echo "description=Development: failing on high/critical only" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run npm audit (production deps)
+        run: |
+          echo "::notice::${{ steps.audit-level.outputs.description }}"
+          npm audit --omit=dev --audit-level=${{ steps.audit-level.outputs.level }}
+
+      - name: Run npm audit (all deps) - informational
+        run: npm audit || true
+        # Show all vulnerabilities but don't fail (informational)
+
+      # Optional: Use better-npm-audit for nicer output
+      # - name: Run better-npm-audit
+      #   run: npx better-npm-audit audit
+
+# Add as a step in existing workflow:
+# - name: Security audit
+#   run: |
+#     if [[ "$GITHUB_REF_NAME" == "main" ]]; then
+#       npm audit --omit=dev --audit-level=low
+#     elif [[ "$GITHUB_REF_NAME" == "staging" ]]; then
+#       npm audit --omit=dev --audit-level=moderate
+#     else
+#       npm audit --omit=dev --audit-level=high
+#     fi

@@ -6,9 +6,17 @@ Create a new version release with changelog and git tag.
 
 ```
 /release [major|minor|patch]
+/release --auto [type]   # Auto-chain to /retro
 ```
 
 Or without argument to auto-detect from PR labels.
+
+## Orchestration
+
+When `--auto` flag is provided (or inherited from chain):
+1. Create release with changelog and tag
+2. Push to remote (with user confirmation or auto if fully automated)
+3. **Automatically invoke `/retro`** for sprint retrospective
 
 ## Process
 

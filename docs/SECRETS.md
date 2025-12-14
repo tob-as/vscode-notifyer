@@ -74,7 +74,33 @@ jobs:
 |--------|---------|
 | `CLOUDFLARE_API_TOKEN` | Deploy workers |
 | `CLOUDFLARE_ACCOUNT_ID` | Account identifier |
-| `CLOUDFLARE_ACCESS_TOKEN` | Manage Access policies |
+| `CF_ACCESS_CLIENT_ID` | E2E tests on Access-protected apps |
+| `CF_ACCESS_CLIENT_SECRET` | E2E tests on Access-protected apps |
+
+### Creating CF Access Service Token
+
+For E2E tests to bypass Cloudflare Access authentication:
+
+1. Go to [Zero Trust Dashboard](https://one.dash.cloudflare.com/)
+2. Navigate: Access → Service Auth → Service Tokens
+3. Click "Create Service Token"
+4. Name it (e.g., "CI E2E Tests")
+5. Copy **Client ID** and **Client Secret** immediately (secret shown only once)
+6. Add to GitHub Secrets:
+   ```bash
+   gh secret set CF_ACCESS_CLIENT_ID
+   gh secret set CF_ACCESS_CLIENT_SECRET
+   ```
+
+**Usage in E2E tests:**
+
+Tests send these headers to bypass Access:
+```typescript
+extraHTTPHeaders: {
+  'CF-Access-Client-Id': process.env.CF_ACCESS_CLIENT_ID,
+  'CF-Access-Client-Secret': process.env.CF_ACCESS_CLIENT_SECRET,
+}
+```
 
 ## Production Secrets
 

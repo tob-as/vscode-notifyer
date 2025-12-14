@@ -6,7 +6,17 @@ Break down a PRD into sprint-sized user stories following INVEST criteria.
 
 ```
 /breakdown [prd-file or issue number]
+/breakdown --auto [prd-file]   # Auto-chain to /sprint-plan
 ```
+
+## Orchestration
+
+When `--auto` flag is provided (or inherited from `/intake --auto`):
+1. Create user stories
+2. Create GitHub Issues for each story
+3. **Automatically invoke `/sprint-plan`** with the created stories
+
+The `--auto` flag propagates through the chain.
 
 ## INVEST Criteria
 

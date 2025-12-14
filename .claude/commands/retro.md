@@ -6,7 +6,18 @@ Facilitate a sprint retrospective and capture action items.
 
 ```
 /retro [sprint-number]
+/retro --auto [sprint-number]   # End of chain, loop back to /intake
 ```
+
+## Orchestration
+
+When `--auto` flag is provided (or inherited from chain):
+1. Complete retrospective
+2. Create meta issues for action items
+3. **Optionally loop back to `/intake`** if there's a queued business use case
+
+This completes the full Scrum cycle:
+`/intake` → `/breakdown` → `/sprint-plan` → `/release` → `/retro` → (next sprint)
 
 ## Process
 

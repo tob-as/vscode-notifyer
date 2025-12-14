@@ -1,63 +1,75 @@
 # Development Workflow
 
-## The Core Loop
+## Product OS: Idea to Delivery
 
-Building apps follows a simple two-phase pattern:
+The complete lifecycle from business idea to production release:
 
 ```
-1. Plan    →  Discuss your idea, refine requirements
-2. /design →  Create design specification (no code)
-3. /build  →  Execute the design (no decisions)
-4. Iterate →  Test, refine, repeat
+1. /intake      →  Business idea → PRD + Epic
+2. /breakdown   →  PRD → User Stories (INVEST)
+3. /sprint-plan →  Stories → Sprint Commitment
+4. [Build]      →  Execute sprint work
+5. /release     →  Version bump + Changelog + Tag
+6. /retro       →  Retrospective → Improvements
 ```
 
-## Phase 1: Plan (Conversation)
+## Phase 1: /intake
 
-Before running any commands, discuss your app idea:
-- What problem does it solve?
-- Who will use it?
-- What are the core features?
+Capture a business use case and transform it into a structured PRD:
+- Problem/Context, Target Audience, Success Criteria
+- Creates `docs/prd/<slug>.md`
+- Drafts GitHub Epic Issue
 
-Claude will help refine your concept. Take your time here - good planning prevents rework.
+Use `--auto` to chain through all phases automatically.
 
-## Phase 2: /design
+## Phase 2: /breakdown
 
-When your idea is clear, run `/design`. This command:
-- Asks clarifying questions about tech stack, UI, data model
-- Creates `.design/spec.md` (what to build)
-- Creates `.design/contracts.md` (component APIs)
-- Makes NO code changes
+Break the PRD into sprint-sized user stories following INVEST:
+- **I**ndependent, **N**egotiable, **V**aluable
+- **E**stimable, **S**mall, **T**estable
+- Creates GitHub Story Issues (5-15 per epic)
 
-The design phase captures all decisions. Review the files before proceeding.
+## Phase 3: /sprint-plan
 
-## Phase 3: /build
+Plan the sprint from the backlog:
+- Set Sprint Goal
+- Apply WIP limits (3-5 in progress)
+- Commit stories based on capacity
 
-When design is approved, run `/build`. This command:
-- Reads `.design/` files
-- Launches specialized agents in parallel
-- Creates all code exactly as specified
-- Runs the application
+## Phase 4: Build
 
-Build does NOT make design decisions. If something is unclear, it stops and asks you to update `.design/` files.
+Execute the sprint work:
+- Use `/create` for new projects
+- Implement stories one by one
+- Mark stories done when complete
 
-## Iteration
+## Phase 5: /release
 
-After `/build` completes:
-- Test the running app
-- Report issues or request changes
-- For bug fixes: Claude fixes directly
-- For design changes: Update `.design/` files, re-run `/build`
+When sprint work is complete:
+- Determine SemVer bump (major/minor/patch)
+- Generate changelog from commits
+- Create git tag and GitHub Release
+
+## Phase 6: /retro
+
+End-of-sprint retrospective:
+- What went well / What to improve
+- Create action items as GitHub Issues
+- Feed improvements back into process
 
 ## Key Principle
 
-**Design decisions and code execution are separate.**
+**GitHub Issues are the single source of truth.**
 
-- `/design` = WHAT to build (decisions)
-- `/build` = HOW to build it (execution)
+All work items, PRDs, stories, and improvements are tracked as GitHub Issues.
+This ensures visibility, traceability, and collaboration.
 
-This separation ensures consistent, predictable results.
+## Automatic Chaining
 
-## Future Commands
+Use `--auto` flag to run the full cycle:
 
-- `/plan` - Strategic planning for complex multi-phase projects
-- `/polish` - UI/UX refinement after initial build
+```
+/intake --auto "Build user dashboard"
+```
+
+This chains: `/intake` → `/breakdown` → `/sprint-plan` → `/release` → `/retro`

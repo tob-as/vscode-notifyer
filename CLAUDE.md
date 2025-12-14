@@ -150,20 +150,26 @@ When working in multi-repo environments:
 
 Persistent todos for this project. Add items here during sessions; review and clean up regularly.
 
-- [x] Add version tracking to skills (completed Wave 3)
-- [x] Document cross-skill interaction (see docs/cross-skill-interaction.md)
+- [x] Add version tracking to skills (Wave 3)
+- [x] Document cross-skill interaction (Wave 3)
 - [x] Redwood SDK as default UI framework (Wave 4)
-- [x] TypeScript-only enforcement (Wave 4)
 - [x] /create v2 with GitHub repo creation (Wave 4)
-- [x] /update command for upstream sync (Wave 4)
 - [x] Zero Trust compliance gate (Wave 5)
-- [x] Vitest testing foundation (Wave 5)
 - [x] Single Path - Redwood only for UI (Wave 6)
-- [x] Smart Permissions - security-critical files (Wave 6)
+- [x] Product OS - /intake, /breakdown, /sprint-plan, /release, /retro (Wave 7)
+- [x] GitHub Issue Forms and Release Drafter (Wave 7)
+- [x] Command orchestration with --auto flag (Wave 8)
+- [x] Quality infrastructure templates (Wave 8)
+- [x] Testing and security scanning templates (Wave 8)
+- [x] PWA and email integration (Wave 8)
+- [x] CI/CD automation templates (Wave 8)
+- [x] Profile auto-detection in setup-claude.sh (Wave 9)
+- [x] All skills/commands always available (Wave 9)
+- [x] Simplified profiles - only control Scope Lock (Wave 9)
 
 ---
 
 *Last updated: 14.12.2025*
-*Phase: Single Path / v0.5*
+*Phase: Profile Simplification / v0.8*
 # Project Overrides
 
