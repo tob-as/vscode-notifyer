@@ -78,6 +78,21 @@ If setup fails, show the error and suggest:
 Setup failed. Check that setup-claude.sh exists and has correct permissions.
 ```
 
+### Step 6b: Verify Scope Lock
+
+After setup, verify the scope lock was created:
+
+```bash
+if ! jq -e '.permissions.write | length > 0' .claude/settings.json > /dev/null 2>&1; then
+  echo "Error: Scope lock not configured"
+  echo "settings.json missing permissions.write"
+  exit 1
+fi
+echo "✓ Scope lock configured"
+```
+
+If scope lock is missing, abort and report the error.
+
 ### Step 7: Create CLAUDE_SCOPE.md
 
 Create a scope lock file for multi-repo safety:

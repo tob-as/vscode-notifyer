@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "read": ["**/*"],
+    "write": [
+      "src/**",
+      "app/**",
+      "public/**",
+      "prisma/**",
+      ".claude/**",
+      ".github/**",
+      "infra/**",
+      "docs/**",
+      "*.config.ts",
+      "*.config.js",
+      "vite.config.ts",
+      "wrangler.jsonc",
+      "wrangler.toml",
+      "package.json",
+      "tsconfig.json",
+      "CLAUDE.md",
+      "CLAUDE_SCOPE.md",
+      "README.md"
+    ]
+  }
+}

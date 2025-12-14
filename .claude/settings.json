@@ -60,6 +60,21 @@
       "Bash(chmod 777:*)",
       "Bash(docker:*)",
       "Bash(sudo:*)"
+    ],
+    "read": ["**/*"],
+    "write": [
+      ".claude/**",
+      ".github/**",
+      "docs/**",
+      "infra/**",
+      "reports/**",
+      "scripts/**",
+      "README.md",
+      "CLAUDE.md",
+      "CLAUDE_SCOPE.md",
+      "setup-claude.sh",
+      "install.sh",
+      "package.json"
     ]
   },
   "statusLine": {

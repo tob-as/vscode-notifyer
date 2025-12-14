@@ -87,3 +87,34 @@ See [Secrets Management](SECRETS.md) for details.
 - Change visibility without security review
 - Store secrets in code or config files
 - Skip the Zero Trust gate
+
+## Scope Lock (Write Allowlist)
+
+Jedes Projekt MUSS eine `.claude/settings.json` mit `permissions.write` haben.
+
+### Warum?
+
+- Verhindert versehentliche Cross-Repo-Schreibzugriffe
+- Claude kann nur in explizit erlaubte Pfade schreiben
+- CI blockiert Deployment ohne gültige Write-Allowlist
+
+### Erlaubte Pfade
+
+| Projekttyp | Erlaubte Pfade |
+|------------|----------------|
+| Meta-Repo | .claude/**, docs/**, KEINE src/** |
+| Redwood | src/**, public/**, prisma/**, .claude/** |
+| Serverless | src/**, .claude/**, wrangler.toml |
+
+### Bei Scope-Verlust
+
+1. STOP - keine weiteren Writes
+2. `git status` prüfen
+3. Unbeabsichtigte Änderungen mit `git restore` zurücksetzen
+4. Session neu starten
+
+### CI Enforcement
+
+- Fail wenn `.claude/settings.json` fehlt
+- Fail wenn `permissions.write` fehlt
+- Fail wenn `permissions.write` = `**/*` (Wildcard)

@@ -116,30 +116,47 @@ validate_profile_templates() {
 
 validate_profile_templates "$PROFILE"
 
-# Merge general.json with profile-specific settings
+# Merge general.json with profile-specific settings and scope settings
 merge_settings() {
   local general="$SCRIPT_DIR/.claude/settings/general.json"
   local profile_settings="$SCRIPT_DIR/.claude/settings/$PROFILE.json"
+  local scope_settings="$SCRIPT_DIR/.claude/templates/settings/$PROFILE.settings.json"
+
+  # Fallback to serverless scope if profile-specific scope doesn't exist
+  if [ ! -f "$scope_settings" ]; then
+    scope_settings="$SCRIPT_DIR/.claude/templates/settings/serverless.settings.json"
+  fi
+
+  local result=""
 
   if [ ! -f "$profile_settings" ]; then
     # No profile-specific settings, just use general
-    cat "$general"
-    return
+    result=$(cat "$general")
+  else
+    # Deep merge: profile overrides general, permission arrays concatenate
+    result=$(jq -s '
+      .[0] as $base | .[1] as $override |
+      ($base.permissions.allow // []) + ($override.permissions.allow // []) | unique | . as $allow |
+      ($base.permissions.ask // []) + ($override.permissions.ask // []) | unique | . as $ask |
+      ($base.permissions.deny // []) + ($override.permissions.deny // []) | unique | . as $deny |
+      ($base.hooks // {}) * ($override.hooks // {}) | . as $hooks |
+      $base * $override |
+      .permissions.allow = $allow |
+      .permissions.ask = $ask |
+      .permissions.deny = $deny |
+      .hooks = $hooks
+    ' "$general" "$profile_settings")
   fi
 
-  # Deep merge: profile overrides general, permission arrays concatenate
-  jq -s '
-    .[0] as $base | .[1] as $override |
-    ($base.permissions.allow // []) + ($override.permissions.allow // []) | unique | . as $allow |
-    ($base.permissions.ask // []) + ($override.permissions.ask // []) | unique | . as $ask |
-    ($base.permissions.deny // []) + ($override.permissions.deny // []) | unique | . as $deny |
-    ($base.hooks // {}) * ($override.hooks // {}) | . as $hooks |
-    $base * $override |
-    .permissions.allow = $allow |
-    .permissions.ask = $ask |
-    .permissions.deny = $deny |
-    .hooks = $hooks
-  ' "$general" "$profile_settings"
+  # Merge scope settings (file path permissions)
+  if [ -f "$scope_settings" ]; then
+    result=$(echo "$result" | jq --slurpfile scope "$scope_settings" '
+      .permissions.read = ($scope[0].permissions.read // ["**/*"]) |
+      .permissions.write = ($scope[0].permissions.write // [])
+    ')
+  fi
+
+  echo "$result"
 }
 
 # Convert to ~/ relative path for @ imports

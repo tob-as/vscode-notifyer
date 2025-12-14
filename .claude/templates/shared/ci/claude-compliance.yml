@@ -143,3 +143,37 @@ jobs:
             # Serverless Worker (no UI) - allowed
             echo "✓ Serverless Worker (no UI requirement)"
           fi
+
+      # 9. SCOPE LOCK CHECK
+      - name: Check scope lock (write allowlist)
+        run: |
+          # settings.json muss existieren
+          if [ ! -f ".claude/settings.json" ]; then
+            echo "::error::Missing .claude/settings.json"
+            echo "Run setup-claude.sh to generate settings"
+            exit 1
+          fi
+
+          # permissions.write muss existieren
+          if ! jq -e '.permissions.write' .claude/settings.json > /dev/null 2>&1; then
+            echo "::error::Missing permissions.write in settings.json"
+            echo "Run setup-claude.sh to regenerate with scope lock"
+            exit 1
+          fi
+
+          # Kein **/* Wildcard erlaubt
+          if jq -e '.permissions.write | any(. == "**/*" or . == "**")' .claude/settings.json | grep -q true; then
+            echo "::error::permissions.write contains unrestricted wildcard **/*"
+            echo "Specify explicit paths to enable scope lock"
+            exit 1
+          fi
+
+          # Nicht leer
+          WRITE_COUNT=$(jq '.permissions.write | length' .claude/settings.json)
+          if [ "$WRITE_COUNT" -eq 0 ]; then
+            echo "::error::permissions.write is empty"
+            echo "Add allowed write paths to settings.json"
+            exit 1
+          fi
+
+          echo "✓ Scope lock: $WRITE_COUNT write paths configured"
